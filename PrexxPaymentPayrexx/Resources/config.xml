@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/shopware/5.2/engine/Shopware/Components/Plugin/schema/config.xsd">
+    <elements>
+        <element required="true" type="text">
+            <name>instanceName</name>
+            <label lang="en">Instance name</label>
+            <description>The instance name of the Payrexx shop</description>
+        </element>
+        <element required="true" type="text">
+            <name>apiKey</name>
+            <label lang="en">API Key</label>
+            <description>The API key you find in your Payrexx merchant backend</description>
+        </element>
+    </elements>
+</config>
