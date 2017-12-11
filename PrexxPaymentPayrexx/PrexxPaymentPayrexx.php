@@ -71,15 +71,15 @@ class PrexxPaymentPayrexx extends Plugin
         /** @var \Shopware\Components\Plugin\PaymentInstaller $installer */
         $installer = $this->container->get('shopware.plugin_payment_installer');
 
-        foreach (['mastercard', 'visa', 'postfinance_card', 'postfinance_efinance', 'apple_pay', 'wirpay'] as $paymentMethod) {
-            $options = [
+        foreach (array('mastercard', 'visa', 'postfinance_card', 'postfinance_efinance', 'apple_pay', 'wirpay') as $paymentMethod) {
+            $options = array(
                 'name' => self::PAYMENT_MEAN_PREFIX . $paymentMethod,
                 'description' => ucwords(str_replace('_', ' ', $paymentMethod)) . ' (Payrexx)',
                 'action' => 'PaymentPayrexx',
                 'active' => 0,
                 'position' => 0,
                 'additionalDescription' => '<img src="{link file=\'frontend/card_' . $paymentMethod . '.svg\' fullPath}" width="50" />'
-            ];
+            );
             $installer->createOrUpdate($context->getPlugin(), $options);
         }
     }

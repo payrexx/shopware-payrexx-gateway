@@ -67,7 +67,7 @@ class PayrexxGatewayService
         $gateway->setFailedRedirectUrl($urls['errorUrl']);
 
         $gateway->setPsp(array());
-        $gateway->setPm([$paymentMean]);
+        $gateway->setPm(array($paymentMean));
         $gateway->setReferenceId($orderNumber);
 
         $gateway->addField('forename', $billingInformation['firstName']);

@@ -20,7 +20,7 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
      */
     public function getWhitelistedCSRFActions()
     {
-        return ['notify'];
+        return array('notify');
     }
 
     /**
@@ -58,8 +58,8 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
         $user = $this->getUser();
 
         // Define the return urls (successful / cancel urls)
-        $successUrl = $router->assemble(['action' => 'return', 'forceSecure' => true]);
-        $errorUrl = $router->assemble(['action' => 'cancel', 'forceSecure' => true]);
+        $successUrl = $router->assemble(array('action' => 'return', 'forceSecure' => true));
+        $errorUrl = $router->assemble(array('action' => 'cancel', 'forceSecure' => true));
 
         $paymentMean = str_replace(PrexxPaymentPayrexx::PAYMENT_MEAN_PREFIX, '', $this->getPaymentShortName());
 
