@@ -70,8 +70,8 @@ class PayrexxGatewayService
         $gateway->setPm(array($paymentMean));
         $gateway->setReferenceId($orderNumber);
 
-        $gateway->addField('forename', $billingInformation['firstName']);
-        $gateway->addField('surname', $billingInformation['lastName']);
+        $gateway->addField('forename', $billingInformation['firstname']);
+        $gateway->addField('surname', $billingInformation['lastname']);
         $gateway->addField('company', $billingInformation['company']);
         $gateway->addField('street', $billingInformation['street']);
         $gateway->addField('postcode', $billingInformation['zipCode']);
