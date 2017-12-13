@@ -8,7 +8,7 @@
  * @author Ueli Kramer <dev@payrexx.com>
  */
 
-namespace PrexxPaymentPayrexx\Components\PayrexxGateway;
+namespace PayrexxPaymentGateway\Components\PayrexxGateway;
 
 use Payrexx\Models\Response\Gateway;
 
@@ -38,7 +38,7 @@ class PayrexxGatewayService
      */
     private function getInterface()
     {
-        $config = Shopware()->Container()->get('shopware.plugin.cached_config_reader')->getByPluginName('PrexxPaymentPayrexx');
+        $config = Shopware()->Container()->get('shopware.plugin.cached_config_reader')->getByPluginName('PayrexxPaymentGateway');
         return new \Payrexx\Payrexx($config['instanceName'], $config['apiKey']);
     }
 

@@ -8,8 +8,8 @@
  * @author Ueli Kramer <dev@payrexx.com>
  */
 
-use PrexxPaymentPayrexx\Components\PayrexxGateway\PayrexxGatewayService;
-use PrexxPaymentPayrexx\PrexxPaymentPayrexx;
+use PayrexxPaymentGateway\Components\PayrexxGateway\PayrexxGatewayService;
+use PayrexxPaymentGateway\PayrexxPaymentGateway;
 use Shopware\Components\CSRFWhitelistAware;
 use Shopware\Models\Order\Status;
 
@@ -42,7 +42,7 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
      */
     private function getProviderUrl()
     {
-        $config = $this->container->get('shopware.plugin.cached_config_reader')->getByPluginName('PrexxPaymentPayrexx');
+        $config = $this->container->get('shopware.plugin.cached_config_reader')->getByPluginName('PayrexxPaymentGateway');
         return 'https://' . $config['instanceName'] . '.payrexx.com/';
     }
 
@@ -61,7 +61,7 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
         $successUrl = $router->assemble(array('action' => 'return', 'forceSecure' => true));
         $errorUrl = $router->assemble(array('action' => 'cancel', 'forceSecure' => true));
 
-        $paymentMean = str_replace(PrexxPaymentPayrexx::PAYMENT_MEAN_PREFIX, '', $this->getPaymentShortName());
+        $paymentMean = str_replace(PayrexxPaymentGateway::PAYMENT_MEAN_PREFIX, '', $this->getPaymentShortName());
 
         return $service->createPayrexxGateway(
             $this->getOrderNumber(),

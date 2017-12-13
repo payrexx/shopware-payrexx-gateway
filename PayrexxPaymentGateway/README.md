@@ -1,4 +1,4 @@
-# PrexxPaymentPayrexx
+# PayrexxPaymentGateway
 
 ## A Payrexx integration for Shopware
 

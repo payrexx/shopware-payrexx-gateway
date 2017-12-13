@@ -6,16 +6,16 @@
  * file that was distributed with this source code.
  */
 
-namespace PrexxPaymentPayrexx;
+namespace PayrexxPaymentGateway;
 
-use PrexxPaymentPayrexx\Components\PayrexxGateway\PayrexxGatewayService;
+use PayrexxPaymentGateway\Components\PayrexxGateway\PayrexxGatewayService;
 use Shopware\Components\Plugin;
 use Shopware\Components\Plugin\Context\ActivateContext;
 use Shopware\Components\Plugin\Context\DeactivateContext;
 use Shopware\Components\Plugin\Context\InstallContext;
 use Shopware\Components\Plugin\Context\UninstallContext;
 
-class PrexxPaymentPayrexx extends Plugin
+class PayrexxPaymentGateway extends Plugin
 {
     const PAYMENT_MEAN_PREFIX = 'payment_payrexx_';
 
