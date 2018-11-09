@@ -29,6 +29,13 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
      */
     public function indexAction()
     {
+        //workaround if amount is 0
+        if($this->getAmount() <= 0){
+            $this->saveOrder(time(), $this->createPaymentUniqueId(),Status::PAYMENT_STATE_COMPLETELY_PAID);
+            Shopware()->Session()->offsetUnset('prexxPaymentPayrexx');
+            $this->redirect(['controller' => 'checkout', 'action' => 'finish']);
+            return;
+        }
         // Get the Payrexx Gateway object
         $payrexxGateway = $this->getPayrexxGateway();
         Shopware()->Session()->prexxPaymentPayrexx['gatewayId'] = $payrexxGateway->getId();
