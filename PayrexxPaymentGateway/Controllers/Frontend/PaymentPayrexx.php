@@ -29,15 +29,17 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
      */
     public function indexAction()
     {
-        //workaround if amount is 0
-        if($this->getAmount() <= 0){
-            $this->saveOrder(time(), $this->createPaymentUniqueId(),Status::PAYMENT_STATE_COMPLETELY_PAID);
+        // Workaround if amount is 0
+        if ($this->getAmount() <= 0) {
+            $this->saveOrder(time(), $this->createPaymentUniqueId(), Status::PAYMENT_STATE_COMPLETELY_PAID);
             Shopware()->Session()->offsetUnset('prexxPaymentPayrexx');
             $this->redirect(['controller' => 'checkout', 'action' => 'finish']);
             return;
         }
+
         // Get the Payrexx Gateway object
         $payrexxGateway = $this->getPayrexxGateway();
+
         Shopware()->Session()->prexxPaymentPayrexx['gatewayId'] = $payrexxGateway->getId();
         // Create Payrexx Gateway link for checkout and redirect user
         $providerUrl = $this->getProviderUrl();
@@ -49,7 +51,16 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
      */
     private function getProviderUrl()
     {
-        $config = $this->container->get('shopware.plugin.cached_config_reader')->getByPluginName('PayrexxPaymentGateway');
+        $shop = false;
+        if ($this->container->initialized('shop')) {
+            $shop = $this->container->get('shop');
+        }
+
+        if (!$shop) {
+            $shop = $this->container->get('models')->getRepository(\Shopware\Models\Shop\Shop::class)->getActiveDefault();
+        }
+
+        $config = $this->container->get('shopware.plugin.cached_config_reader')->getByPluginName('PayrexxPaymentGateway', $shop);
         return 'https://' . $config['instanceName'] . '.payrexx.com/';
     }
 
@@ -99,6 +110,7 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
             );
             Shopware()->Session()->offsetUnset('prexxPaymentPayrexx');
         }
+
         $this->redirect(['controller' => 'checkout', 'action' => 'finish']);
     }
 

@@ -22,6 +22,9 @@ class PayrexxGatewayService
      */
     public function checkPayrexxGatewayStatus($gatewayId)
     {
+        if (!$gatewayId) {
+            return false;
+        }
         $payrexx = $this->getInterface();
         $gateway = new \Payrexx\Models\Request\Gateway();
         $gateway->setId($gatewayId);
@@ -38,7 +41,16 @@ class PayrexxGatewayService
      */
     private function getInterface()
     {
-        $config = Shopware()->Container()->get('shopware.plugin.cached_config_reader')->getByPluginName('PayrexxPaymentGateway');
+        $shop = false;
+        if (Shopware()->Container()->initialized('shop')) {
+            $shop = Shopware()->Container()->get('shop');
+        }
+
+        if (!$shop) {
+            $shop = Shopware()->Container()->get('models')->getRepository(\Shopware\Models\Shop\Shop::class)->getActiveDefault();
+        }
+
+        $config = Shopware()->Container()->get('shopware.plugin.cached_config_reader')->getByPluginName('PayrexxPaymentGateway', $shop);
         return new \Payrexx\Payrexx($config['instanceName'], $config['apiKey']);
     }
 
@@ -53,7 +65,6 @@ class PayrexxGatewayService
      * @param $urls
      * @return Gateway
      *
-     * @todo Exception handling
      */
     public function createPayrexxGateway($orderNumber, $amount, $currency, $paymentMean, $user, $urls)
     {
