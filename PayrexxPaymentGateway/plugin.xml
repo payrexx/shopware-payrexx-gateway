@@ -3,14 +3,19 @@
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/shopware/5.2/engine/Shopware/Components/Plugin/schema/plugin.xsd">
     <label lang="de">Payrexx Payment Gateway</label>
     <label lang="en">Payrexx Payment Gateway</label>
-    <version>1.0.4</version>
+    <version>1.0.5</version>
 
     <link>https://www.payrexx.com</link>
     <author>Payrexx AG</author>
     <compatibility minVersion="5.2.0" />
 
+    <changelog version="1.0.5">
+        <changes lang="de">Erweiterung: Neue Zahlungsmittel: Barzahlen</changes>
+        <changes lang="en">Feature: New payment methods: Viacash</changes>
+    </changelog>
+
     <changelog version="1.0.4">
-        <changes lang="de">Erweiterung: Neue Zahlungsmittel: Bancontact, EPS, Giropay, iDeal</changes>
+        <changes lang="de">Erweiterung: Neue Zahlungsmittel: Barzahlen, EPS, Giropay, iDeal</changes>
         <changes lang="en">Feature: New payment methods: Bancontact, EPS, Giropay, iDeal</changes>
     </changelog>
 

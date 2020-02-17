@@ -73,7 +73,7 @@ class PayrexxPaymentGateway extends Plugin
 
         $paymentMethods = array(
             'mastercard', 'visa', 'postfinance_card', 'postfinance_efinance', 'apple_pay', 'wirpay', 'coinbase',
-            'antepay', 'bancontact', 'eps', 'giropay', 'ideal'
+            'antepay', 'bancontact', 'eps', 'giropay', 'ideal', 'barzahlen'
         );
         foreach ($paymentMethods as $paymentMethod) {
             $options = array(
