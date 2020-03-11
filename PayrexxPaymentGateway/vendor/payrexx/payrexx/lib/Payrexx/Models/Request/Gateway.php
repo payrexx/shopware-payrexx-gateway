@@ -553,7 +553,7 @@ class Gateway extends \Payrexx\Models\Base
     /**
      * @param string $customerStatementDescriptor
      */
-    public function setCustomerStatementDescriptor(string $customerStatementDescriptor): void
+    public function setCustomerStatementDescriptor($customerStatementDescriptor)
     {
         $this->customerStatementDescriptor = $customerStatementDescriptor;
     }

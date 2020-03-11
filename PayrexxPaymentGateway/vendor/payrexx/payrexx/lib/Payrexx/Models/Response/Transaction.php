@@ -58,7 +58,7 @@ class Transaction extends \Payrexx\Models\Request\Transaction
     /**
      * @param string $referenceId
      */
-    public function setReferenceId($referenceId): void
+    public function setReferenceId($referenceId)
     {
         $this->referenceId = $referenceId;
     }
@@ -146,7 +146,7 @@ class Transaction extends \Payrexx\Models\Request\Transaction
     /**
      * @param int $pspId
      */
-    public function setPspId($pspId): void
+    public function setPspId($pspId)
     {
         $this->pspId = $pspId;
     }
@@ -196,7 +196,7 @@ class Transaction extends \Payrexx\Models\Request\Transaction
     /**
      * @param array $invoice
      */
-    public function setInvoice($invoice): void
+    public function setInvoice($invoice)
     {
         $this->invoice = $invoice;
     }
@@ -212,7 +212,7 @@ class Transaction extends \Payrexx\Models\Request\Transaction
     /**
      * @param array $contact
      */
-    public function setContact($contact): void
+    public function setContact($contact)
     {
         $this->contact = $contact;
     }
@@ -228,7 +228,7 @@ class Transaction extends \Payrexx\Models\Request\Transaction
     /**
      * @param string $pageUuid
      */
-    public function setPageUuid($pageUuid): void
+    public function setPageUuid($pageUuid)
     {
         $this->pageUuid = $pageUuid;
     }
