@@ -72,7 +72,7 @@ class PayrexxPaymentGateway extends Plugin
         $installer = $this->container->get('shopware.plugin_payment_installer');
 
         $paymentMethods = array(
-            'mastercard', 'visa', 'postfinance_card', 'postfinance_efinance', 'apple_pay', 'wirpay', 'coinbase',
+            'mastercard', 'visa', 'american_express', 'twint', 'postfinance_card', 'postfinance_efinance', 'apple_pay', 'wirpay', 'coinbase',
             'antepay', 'bancontact', 'eps', 'giropay', 'ideal', 'barzahlen'
         );
         foreach ($paymentMethods as $paymentMethod) {
