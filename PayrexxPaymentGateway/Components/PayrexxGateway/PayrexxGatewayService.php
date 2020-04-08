@@ -86,7 +86,7 @@ class PayrexxGatewayService
         $gateway->addField('surname', $billingInformation['lastname']);
         $gateway->addField('company', $billingInformation['company']);
         $gateway->addField('street', $billingInformation['street']);
-        $gateway->addField('postcode', $billingInformation['zipCode']);
+        $gateway->addField('postcode', $billingInformation['zipcode']);
         $gateway->addField('place', $billingInformation['city']);
         $gateway->addField('email', $user['additional']['user']['email']);
         $gateway->addField('custom_field_1', $orderNumber, array(
