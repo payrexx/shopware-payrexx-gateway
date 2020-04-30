@@ -72,17 +72,48 @@ class PayrexxPaymentGateway extends Plugin
         $installer = $this->container->get('shopware.plugin_payment_installer');
 
         $paymentMethods = array(
-            'mastercard', 'visa', 'american_express', 'twint', 'postfinance_card', 'postfinance_efinance', 'apple_pay', 'wirpay', 'coinbase',
-            'antepay', 'bancontact', 'eps', 'giropay', 'ideal', 'barzahlen'
+            'masterpass' => 'Masterpass',
+            'mastercard' => 'Mastercard',
+            'visa' => 'Visa',
+            'apple_pay' => 'Apple Pay',
+            'maestro' => 'Maestro',
+            'jcb' => 'JCB',
+            'american_express' => 'American Express',
+            'wirpay' => 'WIRpay',
+            'paypal' => 'PayPal',
+            'bitcoin' => 'Bitcoin',
+            'sofortueberweisung_de' => 'Sofort Überweisung',
+            'airplus' => 'Airplus',
+            'billpay' => 'Billpay',
+            'bonuscard' => 'Bonus card',
+            'cashu' => 'CashU',
+            'cb' => 'Carte Bleue',
+            'diners_club' => 'Diners Club',
+            'direct_debit' => 'Direct Debit',
+            'discover' => 'Discover',
+            'elv' => 'ELV',
+            'ideal' => 'iDEAL',
+            'invoice' => 'Invoice',
+            'myone' => 'My One',
+            'paysafecard' => 'Paysafe Card',
+            'postfinance_card' => 'PostFinance Card',
+            'postfinance_efinance' => 'PostFinance E-Finance',
+            'swissbilling' => 'SwissBilling',
+            'twint' => 'TWINT',
+            'barzahlen' => 'Barzahlen/Viacash',
+            'bancontact' => 'Bancontact',
+            'giropay' => 'GiroPay',
+            'eps' => 'EPS',
+            'google_pay' => 'Google Pay',
         );
-        foreach ($paymentMethods as $paymentMethod) {
+        foreach ($paymentMethods as $name => $paymentMethod) {
             $options = array(
-                'name' => self::PAYMENT_MEAN_PREFIX . $paymentMethod,
-                'description' => ucwords(str_replace('_', ' ', $paymentMethod)) . ' (Payrexx)',
+                'name' => self::PAYMENT_MEAN_PREFIX . $name,
+                'description' => $paymentMethod . ' (Payrexx)',
                 'action' => 'PaymentPayrexx',
                 'active' => 0,
                 'position' => 0,
-                'additionalDescription' => '<img src="{link file=\'frontend/card_' . $paymentMethod . '.svg\' fullPath}" width="50" />'
+                'additionalDescription' => '<img src="{link file=\'frontend/card_' . $name . '.svg\' fullPath}" width="50" />'
             );
             $installer->createOrUpdate($context->getPlugin(), $options);
         }
