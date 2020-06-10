@@ -77,6 +77,7 @@ class PayrexxGatewayService
         $gateway->setSuccessRedirectUrl($urls['successUrl']);
         $gateway->setFailedRedirectUrl($urls['errorUrl']);
         $gateway->setCancelRedirectUrl($urls['errorUrl']);
+        $gateway->setSkipResultPage(true);
 
         $gateway->setPsp(array());
         $gateway->setPm(array($paymentMean));
