@@ -30,10 +30,70 @@ class PayrexxGatewayService
         $gateway->setId($gatewayId);
         try {
             $gateway = $payrexx->getOne($gateway);
-            return $gateway->getStatus() == 'confirmed';
+            return ($gateway->getStatus() == 'confirmed' or $gateway->getStatus() == 'uncaptured');
         } catch (\Payrexx\PayrexxException $e) {
         }
         return false;
+    }
+
+    /**
+     * get the Payrexx Gateway status
+     *
+     * @param integer $gatewayId The Payrexx Gateway ID
+     * @return string
+     */
+    public function getPayrexxGatewayStatus($gatewayId)
+    {
+        if (!$gatewayId) {
+            return false;
+        }
+
+        $payrexx = $this->getInterface();
+        $gateway = new \Payrexx\Models\Request\Gateway();
+        $gateway->setId($gatewayId);
+
+        try {
+            /** @var \Payrexx\Models\Request\Gateway $gateway */
+            $gateway = $payrexx->getOne($gateway);
+            if($gateway){
+                $invoices = $gateway->getInvoices();
+                if($invoices && $invoices[0]){
+                    $invoice = $invoices[0];
+                    $transactions = $invoice['transactions'];
+                    if($transactions && $transactions[0]){
+                        return $transactions[0];
+                    }
+                }
+            }
+        } catch (\Payrexx\PayrexxException $e) {
+            return $e->getMessage();
+        }
+        return "";
+    }
+
+    /**
+     * capture a Transaction
+     *
+     * @param integer $gatewayId The Payrexx Gateway ID
+     * @return string
+     */
+    public function captureTransaction($gatewayId)
+    {
+        if (!$gatewayId) {
+            return false;
+        }
+        $payrexx = $this->getInterface();
+
+        $transaction = new \Payrexx\Models\Request\Transaction();
+        $transaction->setId($gatewayId);
+
+        try {
+            $response = $payrexx->capture($transaction);
+            //var_dump($response);
+            return $response;
+        } catch (\Payrexx\PayrexxException $e) {
+            return $e->getMessage();
+        }
     }
 
     /**

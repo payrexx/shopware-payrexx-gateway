@@ -14,6 +14,7 @@ use Shopware\Components\Plugin\Context\ActivateContext;
 use Shopware\Components\Plugin\Context\DeactivateContext;
 use Shopware\Components\Plugin\Context\InstallContext;
 use Shopware\Components\Plugin\Context\UninstallContext;
+use Shopware\Models\Order\Order;
 
 class PayrexxPaymentGateway extends Plugin
 {
@@ -27,6 +28,7 @@ class PayrexxPaymentGateway extends Plugin
             'Shopware_Console_Add_Command' => 'onRegisterSubscriber',
             'Enlight_Controller_Dispatcher_ControllerPath_Frontend_PaymentPayrexx' => 'registerController',
             'Enlight_Bootstrap_InitResource_prexx_payment_payrexx.payrexx_gateway_service' => 'onInitPayrexxGateway',
+            'Shopware_Controllers_Backend_Order::saveAction::before' => 'onBeforeSaveAction',
         );
     }
 
@@ -118,6 +120,52 @@ class PayrexxPaymentGateway extends Plugin
             $installer->createOrUpdate($context->getPlugin(), $options);
         }
     }
+
+
+    /**
+     * @param \Enlight_Hook_HookArgs $args
+     * @throws \Exception
+     */
+    public function onBeforeSaveAction(\Enlight_Hook_HookArgs $args)
+    {
+        $subject = $args->getSubject();
+        $newOrderStatus = $subject->Request()->getParam('status');
+
+        $id = $subject->Request()->getParam('id');
+        if (empty($id)) {
+            return;
+        }
+
+        /** @var Order $order */
+        $order = Shopware()->Models()->getRepository(Order::class)->find($id);
+        if (!($order instanceof Order)) {
+            return;
+        }
+
+        $statusBefore = $order->getOrderStatus();
+        $oldOrderStatus = $statusBefore->getId();
+        $transactionId = $order->getTransactionId();
+        if( $transactionId && ($oldOrderStatus !== $newOrderStatus) && $newOrderStatus == 7){
+
+            /** @var PayrexxGatewayService $service */
+            $service = $this->container->get('prexx_payment_payrexx.payrexx_gateway_service');
+            $transaction = $service->getPayrexxGatewayStatus($transactionId);
+
+            if ($transaction['status'] == 'uncaptured') {
+                $status = $service->captureTransaction($transaction['id']);
+                //var_dump($status);
+            }
+        }
+    }
+
+
+    /**
+     * @param $message
+     */
+    public function createLog($message){
+        file_put_contents(__DIR__."/log.txt", "[ ".date("Y-m-d H:i:s")." ]:" . $message . " \r\n", FILE_APPEND);
+    }
+
 
     /**
      * @inheritdoc

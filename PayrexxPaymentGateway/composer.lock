@@ -13,12 +13,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/payrexx/payrexx-php.git",
-                "reference": "1ab1cad22e4f5a198ac3af851047f39c059fd30b"
+                "reference": "1a779326b1bbd317dc942ad2db60ec564bd98b68"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/payrexx/payrexx-php/zipball/1ab1cad22e4f5a198ac3af851047f39c059fd30b",
-                "reference": "1ab1cad22e4f5a198ac3af851047f39c059fd30b",
+                "url": "https://api.github.com/repos/payrexx/payrexx-php/zipball/1a779326b1bbd317dc942ad2db60ec564bd98b68",
+                "reference": "1a779326b1bbd317dc942ad2db60ec564bd98b68",
                 "shasum": ""
             },
             "require": {
@@ -46,7 +46,7 @@
                 "gateway",
                 "payment"
             ],
-            "time": "2017-10-26 07:12:21"
+            "time": "2020-06-04T14:10:16+00:00"
         }
     ],
     "packages-dev": [],
