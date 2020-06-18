@@ -703,4 +703,40 @@ class Gateway extends \Payrexx\Models\Base
         $this->subscriptionCancellationInterval = $subscriptionCancellationInterval;
     }
 
+    /**
+     * @return array
+     */
+    public function getButtonText()
+    {
+        return $this->buttonText;
+    }
+
+    /**
+     * Use language ID as array key. Use key 0 as default purpose. Will be used for each activated frontend language.
+     *
+     * @param array $buttonText
+     */
+    public function setButtonText($buttonText)
+    {
+        $this->buttonText = $buttonText;
+    }
+
+    /**
+     * @return array
+     */
+    public function getSuccessMessage()
+    {
+        return $this->successMessage;
+    }
+
+    /**
+     * Use language ID as array key. Use key 0 as default purpose. Will be used for each activated frontend language.
+     *
+     * @param array $successMessage
+     */
+    public function setSuccessMessage($successMessage)
+    {
+        $this->successMessage = $successMessage;
+    }
+
 }

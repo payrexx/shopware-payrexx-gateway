@@ -30,19 +30,18 @@ class PayrexxGatewayService
         $gateway->setId($gatewayId);
         try {
             $gateway = $payrexx->getOne($gateway);
-            return ($gateway->getStatus() == 'confirmed' or $gateway->getStatus() == 'uncaptured');
+            return ($gateway->getStatus() == 'confirmed');
         } catch (\Payrexx\PayrexxException $e) {
         }
         return false;
     }
 
     /**
-     * get the Payrexx Gateway status
-     *
-     * @param integer $gatewayId The Payrexx Gateway ID
-     * @return string
+     * get the Payrexx Transaction
+     * @param $gatewayId
+     * @return bool|string
      */
-    public function getPayrexxGatewayStatus($gatewayId)
+    public function getPayrexxTransactionByGatewayID($gatewayId)
     {
         if (!$gatewayId) {
             return false;
@@ -68,7 +67,34 @@ class PayrexxGatewayService
         } catch (\Payrexx\PayrexxException $e) {
             return $e->getMessage();
         }
-        return "";
+        return false;
+    }
+
+    /**
+     * get the Payrexx Transaction
+     * @param $transactionId
+     * @return bool|\Payrexx\Models\Request\Transaction
+     */
+    public function getTransaction($transactionId)
+    {
+        if (!$transactionId) {
+            return false;
+        }
+
+        $payrexx = $this->getInterface();
+        $gateway = new \Payrexx\Models\Request\Transaction();
+        $gateway->setId($transactionId);
+
+        try {
+            /** @var \Payrexx\Models\Request\Transaction $transaction */
+            $transaction = $payrexx->getOne($gateway);
+            if($transaction){
+               return $transaction;
+            }
+        } catch (\Payrexx\PayrexxException $e) {
+            //return $e->getMessage();
+        }
+        return false;
     }
 
     /**

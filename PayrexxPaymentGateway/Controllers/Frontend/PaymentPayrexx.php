@@ -102,13 +102,17 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
     {
         /** @var PayrexxGatewayService $service */
         $service = $this->container->get('prexx_payment_payrexx.payrexx_gateway_service');
-        if ($service->checkPayrexxGatewayStatus(Shopware()->Session()->prexxPaymentPayrexx['gatewayId'])) {
-            $this->saveOrder(
-                Shopware()->Session()->prexxPaymentPayrexx['gatewayId'],
-                $this->createPaymentUniqueId(),
-                Status::PAYMENT_STATE_COMPLETELY_PAID
-            );
-            Shopware()->Session()->offsetUnset('prexxPaymentPayrexx');
+        if ($transaction = $service->checkPayrexxGatewayStatus(Shopware()->Session()->prexxPaymentPayrexx['gatewayId'])) {
+
+
+            if ($transaction && $transaction['uuid'] && $transaction['id']) {
+                $this->saveOrder(
+                    $transaction['uuid'] . "_" . $transaction['id'],
+                    $this->createPaymentUniqueId(),
+                    Status::PAYMENT_STATE_COMPLETELY_PAID
+                );
+                Shopware()->Session()->offsetUnset('prexxPaymentPayrexx');
+            }
         }
 
         $this->redirect(['controller' => 'checkout', 'action' => 'finish']);

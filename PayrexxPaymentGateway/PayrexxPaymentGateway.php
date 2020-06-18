@@ -144,15 +144,21 @@ class PayrexxPaymentGateway extends Plugin
 
         $statusBefore = $order->getOrderStatus();
         $oldOrderStatus = $statusBefore->getId();
-        $transactionId = $order->getTransactionId();
+        $transactionIds = $order->getTransactionId();
+        $transactionIds = explode("_", $transactionIds);
+        if($transactionIds && is_array($transactionIds))
+            $transactionId = $transactionIds[1];
+
         if( $transactionId && ($oldOrderStatus !== $newOrderStatus) && $newOrderStatus == 7){
 
             /** @var PayrexxGatewayService $service */
             $service = $this->container->get('prexx_payment_payrexx.payrexx_gateway_service');
-            $transaction = $service->getPayrexxGatewayStatus($transactionId);
 
-            if ($transaction['status'] == 'uncaptured') {
-                $status = $service->captureTransaction($transaction['id']);
+            /** @var \Payrexx\Models\Request\Transaction $transaction */
+            $transaction = $service->getTransaction($transactionId);
+
+            if ($transaction instanceof \Payrexx\Models\Request\Transaction && $transaction->getStatus() == 'uncaptured') {
+                $status = $service->captureTransaction($transactionId);
                 //var_dump($status);
             }
         }

@@ -3,12 +3,16 @@
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/shopware/5.2/engine/Shopware/Components/Plugin/schema/plugin.xsd">
     <label lang="de">Payrexx Payment Gateway</label>
     <label lang="en">Payrexx Payment Gateway</label>
-    <version>1.0.11</version>
+    <version>1.0.12</version>
 
     <link>https://www.payrexx.com</link>
     <author>Payrexx AG</author>
     <compatibility minVersion="5.2.0" />
 
+    <changelog version="1.0.12">
+        <changes lang="de">Erweiterung: Transaktions UUID nun in Bestellübersicht ersichtlich. Dies Vereinfacht das herstellen der Relation zwischen SW5 Bestellungen und Payrexx Transaktionen</changes>
+        <changes lang="en">Feature: Transaction UUID now in Orderoverview so you can easily recognize the relation between the SW5 Orders and the Payrexx Transactions</changes>
+    </changelog>
     <changelog version="1.0.11">
         <changes lang="de">Erweiterung: Zahlungen ohne Autocapture sind nun möglich</changes>
         <changes lang="en">Feature: Payments without autocapture are now possible</changes>
