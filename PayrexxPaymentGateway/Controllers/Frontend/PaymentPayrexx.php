@@ -102,8 +102,8 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
     {
         /** @var PayrexxGatewayService $service */
         $service = $this->container->get('prexx_payment_payrexx.payrexx_gateway_service');
-        if ($transaction = $service->checkPayrexxGatewayStatus(Shopware()->Session()->prexxPaymentPayrexx['gatewayId'])) {
-
+        if ($service->checkPayrexxGatewayStatus(Shopware()->Session()->prexxPaymentPayrexx['gatewayId'])) {
+            $transaction = $service->getPayrexxTransactionByGatewayID(Shopware()->Session()->prexxPaymentPayrexx['gatewayId']);
 
             if ($transaction && $transaction['uuid'] && $transaction['id']) {
                 $this->saveOrder(
