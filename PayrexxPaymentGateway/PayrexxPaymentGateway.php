@@ -107,6 +107,7 @@ class PayrexxPaymentGateway extends Plugin
             'giropay' => 'GiroPay',
             'eps' => 'EPS',
             'google_pay' => 'Google Pay',
+            'antepay' => 'AntePay'
         );
         foreach ($paymentMethods as $name => $paymentMethod) {
             $options = array(
