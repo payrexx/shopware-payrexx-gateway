@@ -168,6 +168,7 @@ class PayrexxGatewayService
         $gateway->setPsp(array());
         $gateway->setPm(array($paymentMean));
         $gateway->setReferenceId($orderNumber);
+        $gateway->setValidity(15);
 
         $gateway->addField('forename', $billingInformation['firstname']);
         $gateway->addField('surname', $billingInformation['lastname']);
