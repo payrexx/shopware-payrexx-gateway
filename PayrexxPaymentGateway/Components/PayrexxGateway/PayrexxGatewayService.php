@@ -149,10 +149,11 @@ class PayrexxGatewayService
      * @param $paymentMean
      * @param $user
      * @param $urls
+     * @param $basket
      * @return Gateway
      *
      */
-    public function createPayrexxGateway($orderNumber, $amount, $currency, $paymentMean, $user, $urls)
+    public function createPayrexxGateway($orderNumber, $amount, $currency, $paymentMean, $user, $urls, $basket)
     {
         $billingInformation = $user['billingaddress'];
 
@@ -183,6 +184,19 @@ class PayrexxGatewayService
             3 => 'Shopware Order ID',
             4 => 'Shopware Order ID',
         ));
+
+        $prducts = [];
+        if (!empty($basket) && !empty($basket['content'])) {
+            foreach ($basket['content'] as $item) {
+                $prducts[] = [
+                    'name' => $item['articlename'],
+                    'description' => $item['additional_details']['articleName'] ?? '',
+                    'quantity' => $item['quantity'],
+                    'amount' => $item['additional_details']['price_numeric'] * 100
+                ] ;
+            }
+        }
+        $gateway->setCart($prducts);
 
         try {
             return $payrexx->create($gateway);
