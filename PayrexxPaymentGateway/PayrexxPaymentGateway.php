@@ -106,8 +106,12 @@ class PayrexxPaymentGateway extends Plugin
             'bancontact' => 'Bancontact',
             'giropay' => 'GiroPay',
             'eps' => 'EPS',
-            'google_pay' => 'Google Pay',
-            'antepay' => 'AntePay'
+            'google-pay' => 'Google Pay',
+            'coinbase' => 'Coinbase',
+            'antepay' => 'AntePay',
+            'wechat-pay' => 'WeChat Pay',
+            'alipay' => 'Alipay',
+            'samsung_pay' => 'Samsung Pay',
         );
         foreach ($paymentMethods as $name => $paymentMethod) {
             $options = array(
@@ -147,8 +151,7 @@ class PayrexxPaymentGateway extends Plugin
         $oldOrderStatus = $statusBefore->getId();
         $transactionIds = $order->getTransactionId();
         $transactionIds = explode("_", $transactionIds);
-        if($transactionIds && is_array($transactionIds))
-            $transactionId = $transactionIds[1];
+        if($transactionIds && is_array($transactionIds)) $transactionId = $transactionIds[1];
 
         if( $transactionId && ($oldOrderStatus !== $newOrderStatus) && $newOrderStatus == 7){
 
