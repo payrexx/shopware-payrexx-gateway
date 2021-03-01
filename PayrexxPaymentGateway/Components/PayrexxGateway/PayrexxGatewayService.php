@@ -185,18 +185,20 @@ class PayrexxGatewayService
             4 => 'Shopware Order ID',
         ));
 
-        $prducts = [];
+        $products = [];
         if (!empty($basket) && !empty($basket['content'])) {
             foreach ($basket['content'] as $item) {
-                $prducts[] = [
+                $amount = $item['additional_details']['price_numeric'] ?: $item['amountNumeric'];
+                $products[] = [
                     'name' => $item['articlename'],
-                    'description' => $item['additional_details']['articleName'] ?? '',
+                    'description' => $item['additional_details']['description'] ?: '',
                     'quantity' => $item['quantity'],
-                    'amount' => $item['additional_details']['price_numeric'] * 100
+                    'amount' => $amount * 100,
+                    'SKU' => $item['articleID'],
                 ] ;
             }
         }
-        $gateway->setCart($prducts);
+        $gateway->setCart($products);
 
         try {
             return $payrexx->create($gateway);
