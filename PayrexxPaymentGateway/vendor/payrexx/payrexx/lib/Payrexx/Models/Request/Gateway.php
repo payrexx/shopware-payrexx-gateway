@@ -207,16 +207,34 @@ class Gateway extends \Payrexx\Models\Base
     /**
      * optional
      *
-     * @var array $buttonText
+     * @access  protected
+     * @var     array $buttonText
      */
     protected $buttonText;
 
     /**
      * optional
      *
-     * @var array $successMessage
+     * @access  protected
+     * @var     string $lookAndFeelProfile
+     */
+    protected $lookAndFeelProfile;
+
+    /**
+     * optional
+     *
+     * @access  protected
+     * @var     array $successMessage
      */
     protected $successMessage;
+
+    /**
+     * optional
+     *
+     * @access  protected
+     * @var     array       $cart
+     */
+    protected $cart;
 
     /**
      * @access  public
@@ -567,7 +585,7 @@ class Gateway extends \Payrexx\Models\Base
     /**
      * @param string $customerStatementDescriptor
      */
-    public function setCustomerStatementDescriptor($customerStatementDescriptor)
+    public function setCustomerStatementDescriptor(string $customerStatementDescriptor): void
     {
         $this->customerStatementDescriptor = $customerStatementDescriptor;
     }
@@ -722,6 +740,22 @@ class Gateway extends \Payrexx\Models\Base
     }
 
     /**
+     * @return string
+     */
+    public function getLookAndFeelProfile()
+    {
+        return $this->lookAndFeelProfile;
+    }
+
+    /**
+     * @param string $lookAndFeelProfile
+     */
+    public function setLookAndFeelProfile($lookAndFeelProfile)
+    {
+        $this->lookAndFeelProfile = $lookAndFeelProfile;
+    }
+
+    /**
      * @return array
      */
     public function getSuccessMessage()
@@ -737,6 +771,28 @@ class Gateway extends \Payrexx\Models\Base
     public function setSuccessMessage($successMessage)
     {
         $this->successMessage = $successMessage;
+    }
+
+    /**
+     * @return array
+     */
+    public function getCart(): array
+    {
+        return $this->cart;
+    }
+
+    /**
+     * It is a multidimensional array to parse each product as an array
+     *
+     * @param array $cart           Available product values:
+     *                              name => Can be an array with the key as language ID
+     *                              description => Can be an array with the key as language ID
+     *                              quantity => quantity of the product
+     *                              amount => Product amount
+     */
+    public function setCart(array $cart): void
+    {
+        $this->cart = $cart;
     }
 
 }

@@ -17,6 +17,8 @@ class Transaction extends \Payrexx\Models\Base
 {
     /** @var int $amount */
     protected $amount;
+    /** @var string $purpose */
+    protected $purpose;
     /** @var string $referenceId */
     protected $referenceId;
     protected $filterDatetimeUtcGreaterThan;
@@ -38,6 +40,22 @@ class Transaction extends \Payrexx\Models\Base
     public function setAmount($amount)
     {
         $this->amount = $amount;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPurpose()
+    {
+        return $this->purpose;
+    }
+
+    /**
+     * @param string $purpose
+     */
+    public function setPurpose($purpose)
+    {
+        $this->purpose = $purpose;
     }
 
     /**
@@ -67,7 +85,7 @@ class Transaction extends \Payrexx\Models\Base
     /**
      * @param \DateTime $filterDatetimeUtcGreaterThan
      */
-    public function setFilterDatetimeUtcGreaterThan(\DateTime $filterDatetimeUtcGreaterThan)
+    public function setFilterDatetimeUtcGreaterThan(\DateTime $filterDatetimeUtcGreaterThan): void
     {
         $this->filterDatetimeUtcGreaterThan = $filterDatetimeUtcGreaterThan->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d H:i:s');
     }
@@ -83,7 +101,7 @@ class Transaction extends \Payrexx\Models\Base
     /**
      * @param \DateTime $filterDatetimeUtcLessThan
      */
-    public function setFilterDatetimeUtcLessThan(\DateTime $filterDatetimeUtcLessThan)
+    public function setFilterDatetimeUtcLessThan(\DateTime $filterDatetimeUtcLessThan): void
     {
         $this->filterDatetimeUtcLessThan = $filterDatetimeUtcLessThan->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d H:i:s');
     }
@@ -99,7 +117,7 @@ class Transaction extends \Payrexx\Models\Base
     /**
      * @param int $offset
      */
-    public function setOffset($offset)
+    public function setOffset(int $offset): void
     {
         $this->offset = $offset;
     }
@@ -115,7 +133,7 @@ class Transaction extends \Payrexx\Models\Base
     /**
      * @param int $limit
      */
-    public function setLimit($limit)
+    public function setLimit(int $limit): void
     {
         $this->limit = $limit;
     }

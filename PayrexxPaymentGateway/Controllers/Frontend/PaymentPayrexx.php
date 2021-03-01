@@ -74,6 +74,7 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
         $service = $this->container->get('prexx_payment_payrexx.payrexx_gateway_service');
         $router = $this->Front()->Router();
         $user = $this->getUser();
+        $basket = $this->getBasket();
 
         // Define the return urls (successful / cancel urls)
         $successUrl = $router->assemble(array('action' => 'return', 'forceSecure' => true));
@@ -90,7 +91,8 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
             array(
                 'successUrl' => $successUrl,
                 'errorUrl' => $errorUrl,
-            )
+            ),
+            $basket
         );
     }
 
