@@ -150,10 +150,11 @@ class PayrexxGatewayService
      * @param $user
      * @param $urls
      * @param $basket
+     * @param $shippingAmount
      * @return Gateway
      *
      */
-    public function createPayrexxGateway($orderNumber, $amount, $currency, $paymentMean, $user, $urls, $basket)
+    public function createPayrexxGateway($orderNumber, $amount, $currency, $paymentMean, $user, $urls, $basket, $shippingAmount)
     {
         $billingInformation = $user['billingaddress'];
 
@@ -185,6 +186,17 @@ class PayrexxGatewayService
             4 => 'Shopware Order ID',
         ));
 
+        // country
+        if (!empty($user['additional']['countryShipping']['countryiso'])) {
+            $country = $user['additional']['countryShipping']['countryiso'];
+        }
+        if (empty($country)) {
+            $country = $user['additional']['country']['countryiso'];
+        }
+        if (!empty($country)) {
+            $gateway->addField('country', $country);
+        }
+
         $products = [];
         if (!empty($basket) && !empty($basket['content'])) {
             foreach ($basket['content'] as $item) {
@@ -198,7 +210,13 @@ class PayrexxGatewayService
                 ] ;
             }
         }
-        $gateway->setCart($products);
+        if (!empty($products)) {
+            $gateway->setCart($products);
+        }
+
+        if (!empty($shippingAmount)) {
+            $gateway->setShippingAmount($shippingAmount * 100);
+        }
 
         try {
             return $payrexx->create($gateway);
