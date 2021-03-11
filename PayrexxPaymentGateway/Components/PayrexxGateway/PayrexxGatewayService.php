@@ -154,13 +154,17 @@ class PayrexxGatewayService
      * @return Gateway
      *
      */
-    public function createPayrexxGateway($orderNumber, $amount, $currency, $paymentMean, $user, $urls, $basket, $shippingAmount)
+    public function createPayrexxGateway($orderNumber, $amount, $currency, $paymentMean, $user, $urls, $basket, $shippingAmount = 0)
     {
         $billingInformation = $user['billingaddress'];
 
+        if (!empty($shippingAmount)) {
+            $shippingAmount = $shippingAmount * 100;
+        }
+
         $payrexx = $this->getInterface();
         $gateway = new \Payrexx\Models\Request\Gateway();
-        $gateway->setAmount($amount * 100);
+        $gateway->setAmount(($amount * 100) + $shippingAmount);
         $gateway->setCurrency($currency);
         $gateway->setSuccessRedirectUrl($urls['successUrl']);
         $gateway->setFailedRedirectUrl($urls['errorUrl']);
@@ -210,13 +214,18 @@ class PayrexxGatewayService
                 ] ;
             }
         }
+
+        if (!empty($shippingAmount)) {
+            $products[] = [
+                'amount' => $shippingAmount,
+                'quantity' => 1
+            ];
+        }
+
         if (!empty($products)) {
             $gateway->setCart($products);
         }
 
-        if (!empty($shippingAmount)) {
-            $gateway->setShippingAmount($shippingAmount * 100);
-        }
 
         try {
             return $payrexx->create($gateway);
