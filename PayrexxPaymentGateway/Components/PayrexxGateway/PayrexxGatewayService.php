@@ -89,7 +89,7 @@ class PayrexxGatewayService
             /** @var \Payrexx\Models\Request\Transaction $transaction */
             $transaction = $payrexx->getOne($gateway);
             if($transaction){
-               return $transaction;
+                return $transaction;
             }
         } catch (\Payrexx\PayrexxException $e) {
             //return $e->getMessage();
@@ -164,7 +164,7 @@ class PayrexxGatewayService
 
         $payrexx = $this->getInterface();
         $gateway = new \Payrexx\Models\Request\Gateway();
-        $gateway->setAmount(($amount * 100) + $shippingAmount);
+        $gateway->setAmount($amount * 100);
         $gateway->setCurrency($currency);
         $gateway->setSuccessRedirectUrl($urls['successUrl']);
         $gateway->setFailedRedirectUrl($urls['errorUrl']);
@@ -217,13 +217,14 @@ class PayrexxGatewayService
 
         if (!empty($shippingAmount)) {
             $products[] = [
+                'name' => 'Versandkosten',
                 'amount' => $shippingAmount,
                 'quantity' => 1
             ];
         }
 
         if (!empty($products)) {
-            $gateway->setCart($products);
+            $gateway->setBasket($products);
         }
 
 
