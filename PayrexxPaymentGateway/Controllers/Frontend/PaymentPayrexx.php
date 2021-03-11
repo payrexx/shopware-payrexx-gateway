@@ -12,6 +12,7 @@ use PayrexxPaymentGateway\Components\PayrexxGateway\PayrexxGatewayService;
 use PayrexxPaymentGateway\PayrexxPaymentGateway;
 use Shopware\Components\CSRFWhitelistAware;
 use Shopware\Models\Order\Status;
+use Doctrine\ORM\EntityManagerInterface;
 
 class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_Frontend_Payment implements CSRFWhitelistAware
 {
@@ -20,7 +21,82 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
      */
     public function getWhitelistedCSRFActions()
     {
-        return array('notify');
+        return array('notify', 'webhook');
+    }
+
+    public function webhookAction()
+    {
+        $requestTransaction = $this->request()->getParam('transaction');
+        $swOrderId = $requestTransaction['referenceId'];
+        $requestGatewayId = $requestTransaction['invoice']['paymentRequestId'];
+        $requestTransactionStatus = $requestTransaction['status'];
+
+        // check required data
+        if (!$swOrderId || !$requestTransactionStatus) {
+            throw new \Exception('Payrexx Webhook Data incomplete');
+        }
+
+        try {
+            $sql = '
+                SELECT * FROM s_order
+                WHERE ordernumber =?
+            ';
+            $order = Shopware()->Db()->fetchRow($sql, [
+                $swOrderId
+            ]);
+        } catch(\Payrexx\PayrexxException $e) {
+            throw new \Exception('No order found with ID ' . $swOrderId);
+        }
+
+        if (!$order) {
+            throw new \Exception('No order found with ID ' . $swOrderId);
+        }
+        if (!$order['transactionID'] == $requestGatewayId) {
+            throw new \Exception('Transaction ID ('.$order['transactionID'].') does not match requests gateway ID ( '.$requestGatewayId.')');
+        }
+
+        $service = $this->container->get('prexx_payment_payrexx.payrexx_gateway_service');
+        $transaction = $service->getTransaction($requestTransaction['id']);
+
+        if ($requestTransactionStatus != $transaction->getStatus()) {
+            throw new \Exception('Corrupt webhook status');
+        }
+
+        $this->handleTransactionStatus($requestTransactionStatus, $requestGatewayId, $order);
+        die('gut?');
+    }
+
+    private function handleTransactionStatus($requestTransactionStatus,$requestGatewayId, $order) {
+        $status = null;
+        switch ($requestTransactionStatus) {
+            case \Payrexx\Models\Response\Transaction::CONFIRMED:
+                $status = Status::PAYMENT_STATE_COMPLETELY_PAID;
+                break;
+            case \Payrexx\Models\Response\Transaction::WAITING:
+                $status = Status::PAYMENT_STATE_OPEN;
+                break;
+            case \Payrexx\Models\Response\Transaction::REFUNDED:
+            case \Payrexx\Models\Response\Transaction::PARTIALLY_REFUNDED:
+                $status = Status::PAYMENT_STATE_RE_CREDITING;
+                break;
+            case \Payrexx\Models\Response\Transaction::CANCELLED:
+            case \Payrexx\Models\Response\Transaction::EXPIRED:
+            case \Payrexx\Models\Response\Transaction::ERROR:
+                $status = Status::PAYMENT_STATE_THE_PROCESS_HAS_BEEN_CANCELLED;
+                break;
+        }
+
+        if (!$status) {
+            return;
+        }
+
+        try {
+            $this->savePaymentStatus($requestGatewayId, $order['temporaryID'], $status);
+
+
+        } catch(\Payrexx\PayrexxException $e) {
+            var_dump($e->getMessage());die;
+        }
     }
 
     /**
@@ -37,8 +113,21 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
             return;
         }
 
+        if (!$this->getOrderNumber()) {
+            $this->saveOrder(time(), $this->createPaymentUniqueId(), Status::PAYMENT_STATE_OPEN);
+        }
         // Get the Payrexx Gateway object
         $payrexxGateway = $this->getPayrexxGateway();
+
+        $sql = '
+            UPDATE s_order
+            SET transactionID =?
+            WHERE ordernumber =?
+        ';
+        Shopware()->Db()->executeQuery($sql, [
+            $payrexxGateway->getId(),
+            $this->getOrderNumber(),
+        ]);
 
         Shopware()->Session()->prexxPaymentPayrexx['gatewayId'] = $payrexxGateway->getId();
         // Create Payrexx Gateway link for checkout and redirect user
@@ -103,16 +192,26 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
     public function returnAction()
     {
         /** @var PayrexxGatewayService $service */
+        $gatewayId = Shopware()->Session()->prexxPaymentPayrexx['gatewayId'];
         $service = $this->container->get('prexx_payment_payrexx.payrexx_gateway_service');
-        if ($service->checkPayrexxGatewayStatus(Shopware()->Session()->prexxPaymentPayrexx['gatewayId'])) {
+
+        try {
+            $sql = '
+                SELECT * FROM s_order
+                WHERE ordernumber =?
+            ';
+            $order = Shopware()->Db()->fetchRow($sql, [
+                $this->getOrderNumber()
+            ]);
+        } catch(\Payrexx\PayrexxException $e) {
+            throw new \Exception('No order found with ID ' . $this->getOrderNumber());
+        }
+
+        if (!$service->checkPayrexxGatewayStatus(Shopware()->Session()->prexxPaymentPayrexx['gatewayId'])) {
             $transaction = $service->getPayrexxTransactionByGatewayID(Shopware()->Session()->prexxPaymentPayrexx['gatewayId']);
 
             if ($transaction && $transaction['uuid'] && $transaction['id']) {
-                $this->saveOrder(
-                    $transaction['uuid'] . "_" . $transaction['id'],
-                    $this->createPaymentUniqueId(),
-                    Status::PAYMENT_STATE_COMPLETELY_PAID
-                );
+                $this->handleTransactionStatus($transaction['status'], $gatewayId, $order);
                 Shopware()->Session()->offsetUnset('prexxPaymentPayrexx');
             }
         }
