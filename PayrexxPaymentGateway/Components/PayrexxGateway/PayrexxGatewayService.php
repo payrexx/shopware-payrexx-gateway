@@ -89,7 +89,7 @@ class PayrexxGatewayService
             /** @var \Payrexx\Models\Request\Transaction $transaction */
             $transaction = $payrexx->getOne($gateway);
             if($transaction){
-               return $transaction;
+                return $transaction;
             }
         } catch (\Payrexx\PayrexxException $e) {
             //return $e->getMessage();
@@ -150,12 +150,17 @@ class PayrexxGatewayService
      * @param $user
      * @param $urls
      * @param $basket
+     * @param $shippingAmount
      * @return Gateway
      *
      */
-    public function createPayrexxGateway($orderNumber, $amount, $currency, $paymentMean, $user, $urls, $basket)
+    public function createPayrexxGateway($orderNumber, $amount, $currency, $paymentMean, $user, $urls, $basket, $shippingAmount = 0)
     {
         $billingInformation = $user['billingaddress'];
+
+        if (!empty($shippingAmount)) {
+            $shippingAmount = $shippingAmount * 100;
+        }
 
         $payrexx = $this->getInterface();
         $gateway = new \Payrexx\Models\Request\Gateway();
@@ -185,6 +190,17 @@ class PayrexxGatewayService
             4 => 'Shopware Order ID',
         ));
 
+        // country
+        if (!empty($user['additional']['countryShipping']['countryiso'])) {
+            $country = $user['additional']['countryShipping']['countryiso'];
+        }
+        if (empty($country)) {
+            $country = $user['additional']['country']['countryiso'];
+        }
+        if (!empty($country)) {
+            $gateway->addField('country', $country);
+        }
+
         $products = [];
         if (!empty($basket) && !empty($basket['content'])) {
             foreach ($basket['content'] as $item) {
@@ -198,7 +214,19 @@ class PayrexxGatewayService
                 ] ;
             }
         }
-        $gateway->setCart($products);
+
+        if (!empty($shippingAmount)) {
+            $products[] = [
+                'name' => 'Versandkosten',
+                'amount' => $shippingAmount,
+                'quantity' => 1
+            ];
+        }
+
+        if (!empty($products)) {
+            $gateway->setBasket($products);
+        }
+
 
         try {
             return $payrexx->create($gateway);

@@ -164,6 +164,7 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
         $router = $this->Front()->Router();
         $user = $this->getUser();
         $basket = $this->getBasket();
+        $shippingAmount = $this->getShipment();
 
         // Define the return urls (successful / cancel urls)
         $successUrl = $router->assemble(array('action' => 'return', 'forceSecure' => true));
@@ -181,7 +182,8 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
                 'successUrl' => $successUrl,
                 'errorUrl' => $errorUrl,
             ),
-            $basket
+            $basket,
+            $shippingAmount
         );
     }
 
