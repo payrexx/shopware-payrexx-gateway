@@ -204,8 +204,8 @@ class PayrexxGatewayService
                     'description' => $item['additional_details']['description'] ?: '',
                     'quantity' => $item['quantity'],
                     'amount' => $amount * 100,
-                    'sku' => $item['articleID'],
-                ] ;
+                    'sku' => $item['ordernumber'],
+                ];
             }
         }
 
