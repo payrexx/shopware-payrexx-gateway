@@ -174,7 +174,7 @@ class PayrexxGatewayService
         $gateway->setPsp(array());
         $gateway->setPm(array($paymentMean));
         $gateway->setReferenceId($orderNumber);
-        $gateway->setValidity(15);
+        $gateway->setValidity(60);
 
         $gateway->addField('forename', $billingInformation['firstname']);
         $gateway->addField('surname', $billingInformation['lastname']);
@@ -183,12 +183,6 @@ class PayrexxGatewayService
         $gateway->addField('postcode', $billingInformation['zipcode']);
         $gateway->addField('place', $billingInformation['city']);
         $gateway->addField('email', $user['additional']['user']['email']);
-        $gateway->addField('custom_field_1', $orderNumber, array(
-            1 => 'Shopware Order ID',
-            2 => 'Shopware B-Nr.',
-            3 => 'Shopware Order ID',
-            4 => 'Shopware Order ID',
-        ));
 
         // country
         if (!empty($user['additional']['countryShipping']['countryiso'])) {
