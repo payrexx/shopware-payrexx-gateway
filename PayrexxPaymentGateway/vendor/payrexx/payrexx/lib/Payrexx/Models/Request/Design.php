@@ -114,7 +114,7 @@ class Design extends Base
     /**
      * @param string $uuid
      */
-    public function setUuid(string $uuid): void
+    public function setUuid(string $uuid)
     {
         $this->uuid = $uuid;
     }
@@ -122,7 +122,7 @@ class Design extends Base
     /**
      * @return string
      */
-    public function getUuid(): string
+    public function getUuid()
     {
         return $this->uuid;
     }
@@ -130,7 +130,7 @@ class Design extends Base
     /**
      * @return bool
      */
-    public function isDefault(): bool
+    public function isDefault()
     {
         return (bool)$this->default;
     }
@@ -138,7 +138,7 @@ class Design extends Base
     /**
      * @param bool $default
      */
-    public function setDefault(bool $default): void
+    public function setDefault(bool $default)
     {
         $this->default = (int)$default;
     }
@@ -146,7 +146,7 @@ class Design extends Base
     /**
      * @return string
      */
-    public function getName(): string
+    public function getName()
     {
         return $this->name;
     }
@@ -154,7 +154,7 @@ class Design extends Base
     /**
      * @param string $name
      */
-    public function setName(string $name): void
+    public function setName(string $name)
     {
         $this->name = $name;
     }
@@ -162,7 +162,7 @@ class Design extends Base
     /**
      * @return string
      */
-    public function getFontFamily(): string
+    public function getFontFamily()
     {
         return $this->fontFamily;
     }
@@ -170,7 +170,7 @@ class Design extends Base
     /**
      * @param string $fontFamily
      */
-    public function setFontFamily(string $fontFamily): void
+    public function setFontFamily(string $fontFamily)
     {
         $this->fontFamily = $fontFamily;
     }
@@ -178,7 +178,7 @@ class Design extends Base
     /**
      * @return string
      */
-    public function getFontSize(): string
+    public function getFontSize()
     {
         return $this->fontSize;
     }
@@ -186,7 +186,7 @@ class Design extends Base
     /**
      * @param string $fontSize
      */
-    public function setFontSize(string $fontSize): void
+    public function setFontSize(string $fontSize)
     {
         $this->fontSize = $fontSize;
     }
@@ -194,7 +194,7 @@ class Design extends Base
     /**
      * @return string
      */
-    public function getTextColor(): string
+    public function getTextColor()
     {
         return $this->textColor;
     }
@@ -202,7 +202,7 @@ class Design extends Base
     /**
      * @param string $textColor
      */
-    public function setTextColor(string $textColor): void
+    public function setTextColor(string $textColor)
     {
         $this->textColor = $textColor;
     }
@@ -210,7 +210,7 @@ class Design extends Base
     /**
      * @return string
      */
-    public function getTextColorVPOS(): string
+    public function getTextColorVPOS()
     {
         return $this->textColorVPOS;
     }
@@ -218,7 +218,7 @@ class Design extends Base
     /**
      * @param string $textColorVPOS
      */
-    public function setTextColorVPOS(string $textColorVPOS): void
+    public function setTextColorVPOS(string $textColorVPOS)
     {
         $this->textColorVPOS = $textColorVPOS;
     }
@@ -226,7 +226,7 @@ class Design extends Base
     /**
      * @return string
      */
-    public function getLinkColor(): string
+    public function getLinkColor()
     {
         return $this->linkColor;
     }
@@ -234,7 +234,7 @@ class Design extends Base
     /**
      * @param string $linkColor
      */
-    public function setLinkColor(string $linkColor): void
+    public function setLinkColor(string $linkColor)
     {
         $this->linkColor = $linkColor;
     }
@@ -242,7 +242,7 @@ class Design extends Base
     /**
      * @return string
      */
-    public function getLinkHoverColor(): string
+    public function getLinkHoverColor()
     {
         return $this->linkHoverColor;
     }
@@ -250,7 +250,7 @@ class Design extends Base
     /**
      * @param string $linkHoverColor
      */
-    public function setLinkHoverColor(string $linkHoverColor): void
+    public function setLinkHoverColor(string $linkHoverColor)
     {
         $this->linkHoverColor = $linkHoverColor;
     }
@@ -258,7 +258,7 @@ class Design extends Base
     /**
      * @return string
      */
-    public function getButtonColor(): string
+    public function getButtonColor()
     {
         return $this->buttonColor;
     }
@@ -266,7 +266,7 @@ class Design extends Base
     /**
      * @param string $buttonColor
      */
-    public function setButtonColor(string $buttonColor): void
+    public function setButtonColor(string $buttonColor)
     {
         $this->buttonColor = $buttonColor;
     }
@@ -274,7 +274,7 @@ class Design extends Base
     /**
      * @return string
      */
-    public function getButtonHoverColor(): string
+    public function getButtonHoverColor()
     {
         return $this->buttonHoverColor;
     }
@@ -282,7 +282,7 @@ class Design extends Base
     /**
      * @param string $buttonHoverColor
      */
-    public function setButtonHoverColor(string $buttonHoverColor): void
+    public function setButtonHoverColor(string $buttonHoverColor)
     {
         $this->buttonHoverColor = $buttonHoverColor;
     }
@@ -290,7 +290,7 @@ class Design extends Base
     /**
      * @return string
      */
-    public function getBackground(): string
+    public function getBackground()
     {
         return $this->background;
     }
@@ -298,7 +298,7 @@ class Design extends Base
     /**
      * @param string $background
      */
-    public function setBackground(string $background): void
+    public function setBackground(string $background)
     {
         $this->background = $background;
     }
@@ -306,7 +306,7 @@ class Design extends Base
     /**
      * @return string
      */
-    public function getBackgroundColor(): string
+    public function getBackgroundColor()
     {
         return $this->backgroundColor;
     }
@@ -314,7 +314,7 @@ class Design extends Base
     /**
      * @param string $backgroundColor
      */
-    public function setBackgroundColor(string $backgroundColor): void
+    public function setBackgroundColor(string $backgroundColor)
     {
         $this->backgroundColor = $backgroundColor;
     }
@@ -322,7 +322,7 @@ class Design extends Base
     /**
      * @return string
      */
-    public function getHeaderBackground(): string
+    public function getHeaderBackground()
     {
         return $this->headerBackground;
     }
@@ -330,7 +330,7 @@ class Design extends Base
     /**
      * @param string $headerBackground
      */
-    public function setHeaderBackground(string $headerBackground): void
+    public function setHeaderBackground(string $headerBackground)
     {
         $this->headerBackground = $headerBackground;
     }
@@ -338,7 +338,7 @@ class Design extends Base
     /**
      * @return string
      */
-    public function getHeaderBackgroundColor(): string
+    public function getHeaderBackgroundColor()
     {
         return $this->headerBackgroundColor;
     }
@@ -346,7 +346,7 @@ class Design extends Base
     /**
      * @param string $headerBackgroundColor
      */
-    public function setHeaderBackgroundColor(string $headerBackgroundColor): void
+    public function setHeaderBackgroundColor(string $headerBackgroundColor)
     {
         $this->headerBackgroundColor = $headerBackgroundColor;
     }
@@ -354,7 +354,7 @@ class Design extends Base
     /**
      * @return string
      */
-    public function getEmailHeaderBackgroundColor(): string
+    public function getEmailHeaderBackgroundColor()
     {
         return $this->emailHeaderBackgroundColor;
     }
@@ -362,7 +362,7 @@ class Design extends Base
     /**
      * @param string $emailHeaderBackgroundColor
      */
-    public function setEmailHeaderBackgroundColor(string $emailHeaderBackgroundColor): void
+    public function setEmailHeaderBackgroundColor(string $emailHeaderBackgroundColor)
     {
         $this->emailHeaderBackgroundColor = $emailHeaderBackgroundColor;
     }
@@ -370,7 +370,7 @@ class Design extends Base
     /**
      * @return string
      */
-    public function getHeaderImageShape(): string
+    public function getHeaderImageShape()
     {
         return $this->headerImageShape;
     }
@@ -378,7 +378,7 @@ class Design extends Base
     /**
      * @param string $headerImageShape
      */
-    public function setHeaderImageShape(string $headerImageShape): void
+    public function setHeaderImageShape(string $headerImageShape)
     {
         $this->headerImageShape = $headerImageShape;
     }
@@ -386,7 +386,7 @@ class Design extends Base
     /**
      * @return bool
      */
-    public function isUseIndividualEmailLogo(): bool
+    public function isUseIndividualEmailLogo()
     {
         return (bool)$this->useIndividualEmailLogo;
     }
@@ -394,7 +394,7 @@ class Design extends Base
     /**
      * @param bool $useIndividualEmailLogo
      */
-    public function setUseIndividualEmailLogo(bool $useIndividualEmailLogo): void
+    public function setUseIndividualEmailLogo(bool $useIndividualEmailLogo)
     {
         $this->useIndividualEmailLogo = (int)$useIndividualEmailLogo;
     }
@@ -402,7 +402,7 @@ class Design extends Base
     /**
      * @return string
      */
-    public function getLogoBackgroundColor(): string
+    public function getLogoBackgroundColor()
     {
         return $this->logoBackgroundColor;
     }
@@ -410,7 +410,7 @@ class Design extends Base
     /**
      * @param string $logoBackgroundColor
      */
-    public function setLogoBackgroundColor(string $logoBackgroundColor): void
+    public function setLogoBackgroundColor(string $logoBackgroundColor)
     {
         $this->logoBackgroundColor = $logoBackgroundColor;
     }
@@ -418,7 +418,7 @@ class Design extends Base
     /**
      * @return string
      */
-    public function getLogoBorderColor(): string
+    public function getLogoBorderColor()
     {
         return $this->logoBorderColor;
     }
@@ -426,7 +426,7 @@ class Design extends Base
     /**
      * @param string $logoBorderColor
      */
-    public function setLogoBorderColor(string $logoBorderColor): void
+    public function setLogoBorderColor(string $logoBorderColor)
     {
         $this->logoBorderColor = $logoBorderColor;
     }
@@ -434,7 +434,7 @@ class Design extends Base
     /**
      * @return string
      */
-    public function getVPOSGradientColor1(): string
+    public function getVPOSGradientColor1()
     {
         return $this->VPOSGradientColor1;
     }
@@ -442,7 +442,7 @@ class Design extends Base
     /**
      * @param string $VPOSGradientColor1
      */
-    public function setVPOSGradientColor1(string $VPOSGradientColor1): void
+    public function setVPOSGradientColor1(string $VPOSGradientColor1)
     {
         $this->VPOSGradientColor1 = $VPOSGradientColor1;
     }
@@ -450,7 +450,7 @@ class Design extends Base
     /**
      * @return string
      */
-    public function getVPOSGradientColor2(): string
+    public function getVPOSGradientColor2()
     {
         return $this->VPOSGradientColor2;
     }
@@ -458,7 +458,7 @@ class Design extends Base
     /**
      * @param string $VPOSGradientColor2
      */
-    public function setVPOSGradientColor2(string $VPOSGradientColor2): void
+    public function setVPOSGradientColor2(string $VPOSGradientColor2)
     {
         $this->VPOSGradientColor2 = $VPOSGradientColor2;
     }
@@ -466,7 +466,7 @@ class Design extends Base
     /**
      * @return bool
      */
-    public function isEnableRoundedCorners(): bool
+    public function isEnableRoundedCorners()
     {
         return (bool)$this->enableRoundedCorners;
     }
@@ -474,7 +474,7 @@ class Design extends Base
     /**
      * @param bool $enableRoundedCorners
      */
-    public function setEnableRoundedCorners(bool $enableRoundedCorners): void
+    public function setEnableRoundedCorners(bool $enableRoundedCorners)
     {
         $this->enableRoundedCorners = (int)$enableRoundedCorners;
     }
@@ -586,7 +586,7 @@ class Design extends Base
     /**
      * @param int $offset
      */
-    public function setOffset(int $offset): void
+    public function setOffset(int $offset)
     {
         $this->offset = $offset;
     }
@@ -602,7 +602,7 @@ class Design extends Base
     /**
      * @param int $limit
      */
-    public function setLimit(int $limit): void
+    public function setLimit(int $limit)
     {
         $this->limit = $limit;
     }

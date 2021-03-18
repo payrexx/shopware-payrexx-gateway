@@ -585,7 +585,7 @@ class Gateway extends \Payrexx\Models\Base
     /**
      * @param string $customerStatementDescriptor
      */
-    public function setCustomerStatementDescriptor(string $customerStatementDescriptor): void
+    public function setCustomerStatementDescriptor(string $customerStatementDescriptor)
     {
         $this->customerStatementDescriptor = $customerStatementDescriptor;
     }
@@ -776,7 +776,7 @@ class Gateway extends \Payrexx\Models\Base
     /**
      * @return array
      */
-    public function getBasket(): array
+    public function getBasket()
     {
         return $this->basket;
     }
@@ -790,7 +790,7 @@ class Gateway extends \Payrexx\Models\Base
      *                              quantity => quantity of the product
      *                              amount => Product amount
      */
-    public function setBasket(array $basket): void
+    public function setBasket(array $basket)
     {
         $this->basket = $basket;
     }

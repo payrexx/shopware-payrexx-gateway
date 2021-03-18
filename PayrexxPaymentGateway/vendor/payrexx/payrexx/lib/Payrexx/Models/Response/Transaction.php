@@ -195,7 +195,7 @@ class Transaction extends \Payrexx\Models\Request\Transaction
     /**
      * @param array $invoice
      */
-    public function setInvoice($invoice): void
+    public function setInvoice($invoice)
     {
         $this->invoice = $invoice;
     }
@@ -211,7 +211,7 @@ class Transaction extends \Payrexx\Models\Request\Transaction
     /**
      * @param array $contact
      */
-    public function setContact($contact): void
+    public function setContact($contact)
     {
         $this->contact = $contact;
     }
@@ -227,7 +227,7 @@ class Transaction extends \Payrexx\Models\Request\Transaction
     /**
      * @param string $pageUuid
      */
-    public function setPageUuid($pageUuid): void
+    public function setPageUuid($pageUuid)
     {
         $this->pageUuid = $pageUuid;
     }
