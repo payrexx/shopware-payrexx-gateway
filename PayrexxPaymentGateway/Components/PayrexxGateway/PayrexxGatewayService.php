@@ -198,7 +198,7 @@ class PayrexxGatewayService
         $products = [];
         if (!empty($basket) && !empty($basket['content'])) {
             foreach ($basket['content'] as $item) {
-                $amount = $item['additional_details']['price_numeric'] ?: $item['amountNumeric'];
+                $amount = $item['amountNumeric'];
                 $products[] = [
                     'name' => $item['articlename'],
                     'description' => $item['additional_details']['description'] ?: '',

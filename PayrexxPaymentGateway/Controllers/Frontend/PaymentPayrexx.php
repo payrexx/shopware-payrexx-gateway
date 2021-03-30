@@ -42,7 +42,7 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
         }
 
         if (!$this->getOrderNumber()) {
-            $this->saveOrder(time(), $this->createPaymentUniqueId(), Status::PAYMENT_STATE_OPEN);
+            $this->saveOrder(time(), $this->createPaymentUniqueId(), Status::PAYMENT_STATE_OPEN, false);
         }
 
         // Get the Payrexx Gateway object
