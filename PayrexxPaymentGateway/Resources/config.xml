@@ -12,5 +12,30 @@
             <label lang="en">API Key</label>
             <description>The API key you find in your Payrexx merchant backend</description>
         </element>
+        <element required="true" type="text" scope="shop">
+            <name>apiKey</name>
+            <label lang="en">API Key</label>
+            <description>The API key you find in your Payrexx merchant backend</description>
+        </element>
+
+        <element type="select" scope="shop">
+            <name>orderBeforePayment</name>
+            <label lang="en">Create order before redirecting to Payrexx</label>
+            <value>yes</value>
+            <description lang="en">Only when the order is created before redirecting, the Webhook functionality of Payrexx can be fully used. Also the order number can only in this case be sent to the Payrexx System.</description>
+            <store>
+                <option>
+                    <value>1</value>
+                    <label lang="en">Yes</label>
+                </option>
+                <option>
+                    <value>0</value>
+                    <label lang="en">No</label>
+                </option>
+            </store>
+            <options>
+                <position>9</position>
+            </options>
+        </element>
     </elements>
 </config>

@@ -11,30 +11,10 @@
 namespace PayrexxPaymentGateway\Components\PayrexxGateway;
 
 use Payrexx\Models\Response\Gateway;
+use PayrexxPaymentGateway\Components\Services\ConfigService;
 
 class PayrexxGatewayService
 {
-    /**
-     * Check the Payrexx Gateway status whether it is paid or not
-     *
-     * @param integer $gatewayId The Payrexx Gateway ID
-     * @return bool TRUE if the payment has been confirmed, FALSE if it is not confirmed
-     */
-    public function checkPayrexxGatewayStatus($gatewayId)
-    {
-        if (!$gatewayId) {
-            return false;
-        }
-        $payrexx = $this->getInterface();
-        $gateway = new \Payrexx\Models\Request\Gateway();
-        $gateway->setId($gatewayId);
-        try {
-            $gateway = $payrexx->getOne($gateway);
-            return ($gateway->getStatus() == 'confirmed');
-        } catch (\Payrexx\PayrexxException $e) {
-        }
-        return false;
-    }
 
     /**
      * get the Payrexx Transaction
@@ -127,6 +107,14 @@ class PayrexxGatewayService
      */
     private function getInterface()
     {
+        /** @var ConfigService $configService */
+        $configService = Shopware()->Container()->get('prexx_payment_payrexx.config_service');
+        $config = $configService->getConfig();
+
+        return new \Payrexx\Payrexx($config['instanceName'], $config['apiKey']);
+    }
+
+    public function getConfig() {
         $shop = false;
         if (Shopware()->Container()->initialized('shop')) {
             $shop = Shopware()->Container()->get('shop');
@@ -136,8 +124,7 @@ class PayrexxGatewayService
             $shop = Shopware()->Container()->get('models')->getRepository(\Shopware\Models\Shop\Shop::class)->getActiveDefault();
         }
 
-        $config = Shopware()->Container()->get('shopware.plugin.cached_config_reader')->getByPluginName('PayrexxPaymentGateway', $shop);
-        return new \Payrexx\Payrexx($config['instanceName'], $config['apiKey']);
+        return Shopware()->Container()->get('shopware.plugin.cached_config_reader')->getByPluginName('PayrexxPaymentGateway', $shop);
     }
 
     /**
@@ -198,7 +185,8 @@ class PayrexxGatewayService
         $products = [];
         if (!empty($basket) && !empty($basket['content'])) {
             foreach ($basket['content'] as $item) {
-                $amount = $item['amountNumeric'];
+                $amount = floatval($item['priceNumeric']);
+
                 $products[] = [
                     'name' => $item['articlename'],
                     'description' => $item['additional_details']['description'] ?: '',

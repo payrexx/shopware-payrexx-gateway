@@ -9,6 +9,8 @@
  */
 
 use PayrexxPaymentGateway\Components\PayrexxGateway\PayrexxGatewayService;
+use PayrexxPaymentGateway\Components\Services\ConfigService;
+use PayrexxPaymentGateway\Components\Services\OrderService;
 use PayrexxPaymentGateway\PayrexxPaymentGateway;
 use Shopware\Components\CSRFWhitelistAware;
 use Shopware\Models\Order\Status;
@@ -31,7 +33,12 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
      */
     public function indexAction()
     {
+        /** @var OrderService $orderService */
         $orderService = $this->container->get('prexx_payment_payrexx.order_service');
+
+        /** @var ConfigService $configService */
+        $configService = $this->container->get('prexx_payment_payrexx.config_service');
+        $config = $configService->getConfig();
 
         // Workaround if amount is 0
         if ($this->getAmount() <= 0) {
@@ -41,14 +48,16 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
             return;
         }
 
-        if (!$this->getOrderNumber()) {
+        if (!$this->getOrderNumber() && $config['orderBeforePayment']) {
             $this->saveOrder(time(), $this->createPaymentUniqueId(), Status::PAYMENT_STATE_OPEN, false);
         }
 
         // Get the Payrexx Gateway object
         $payrexxGateway = $this->getPayrexxGateway();
 
-        $orderService->addTransactionIdToOrder($this->getOrderNumber(), $payrexxGateway->getId());
+        if ($config['orderBeforePayment']) {
+            $orderService->addTransactionIdToOrder($this->getOrderNumber(), $payrexxGateway->getId());
+        }
 
         Shopware()->Session()->prexxPaymentPayrexx['gatewayId'] = $payrexxGateway->getId();
         // Create Payrexx Gateway link for checkout and redirect user
@@ -61,16 +70,10 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
      */
     private function getProviderUrl()
     {
-        $shop = false;
-        if ($this->container->initialized('shop')) {
-            $shop = $this->container->get('shop');
-        }
+        /** @var ConfigService $configService */
+        $configService = $this->container->get('prexx_payment_payrexx.config_service');
+        $config = $configService->getConfig();
 
-        if (!$shop) {
-            $shop = $this->container->get('models')->getRepository(\Shopware\Models\Shop\Shop::class)->getActiveDefault();
-        }
-
-        $config = $this->container->get('shopware.plugin.cached_config_reader')->getByPluginName('PayrexxPaymentGateway', $shop);
         return 'https://' . $config['instanceName'] . '.payrexx.com/';
     }
 
@@ -80,8 +83,9 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
      */
     private function getPayrexxGateway()
     {
-        /** @var PayrexxGatewayService $service */
-        $service = $this->container->get('prexx_payment_payrexx.payrexx_gateway_service');
+        /** @var PayrexxGatewayService $gatewayService */
+        $gatewayService = $this->container->get('prexx_payment_payrexx.payrexx_gateway_service');
+
         $router = $this->Front()->Router();
         $user = $this->getUser();
         $basket = $this->getBasket();
@@ -93,7 +97,7 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
 
         $paymentMean = str_replace(PayrexxPaymentGateway::PAYMENT_MEAN_PREFIX, '', $this->getPaymentShortName());
 
-        return $service->createPayrexxGateway(
+        return $gatewayService->createPayrexxGateway(
             $this->getOrderNumber(),
             $this->getAmount(),
             $this->getCurrencyShortName(),
@@ -114,21 +118,36 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
      */
     public function returnAction()
     {
-        /** @var PayrexxGatewayService $service */
-        $gatewayId = Shopware()->Session()->prexxPaymentPayrexx['gatewayId'];
-        $service = $this->container->get('prexx_payment_payrexx.payrexx_gateway_service');
+        /** @var PayrexxGatewayService $gatewayService */
+        $gatewayService = $this->container->get('prexx_payment_payrexx.payrexx_gateway_service');
 
+        /** @var ConfigService $configService */
+        $configService = $this->container->get('prexx_payment_payrexx.config_service');
+        $config = $configService->getConfig();
+
+        /** @var OrderService $orderService */
         $orderService = $this->container->get('prexx_payment_payrexx.order_service');
-        $order = $orderService->getShopwareOrderByNumber($this->getOrderNumber());
 
-        if (!$service->checkPayrexxGatewayStatus(Shopware()->Session()->prexxPaymentPayrexx['gatewayId'])) {
-            $transaction = $service->getPayrexxTransactionByGatewayID(Shopware()->Session()->prexxPaymentPayrexx['gatewayId']);
+        $gatewayId = Shopware()->Session()->prexxPaymentPayrexx['gatewayId'];
+        $transaction = $gatewayService->getPayrexxTransactionByGatewayID($gatewayId);
+        if ($transaction = $gatewayService->getPayrexxTransactionByGatewayID($gatewayId)) {
 
-            if ($transaction && $transaction['uuid'] && $transaction['id']) {
-                $this->handleTransactionStatus($transaction['status'], $gatewayId, $order);
-                Shopware()->Session()->offsetUnset('prexxPaymentPayrexx');
-                $orderService->addTransactionIdToOrder($this->getOrderNumber(), $transaction->getUuid());
+
+            if (!$transaction || !$transaction['uuid']) {
+                $this->redirect(['controller' => 'checkout', 'action' => 'finish']);
             }
+
+            if (!$config['orderBeforePayment']) {
+                $this->saveOrder(
+                    $gatewayId,
+                    $this->createPaymentUniqueId(),
+                    Status::PAYMENT_STATE_OPEN
+                );
+            }
+            $order = $orderService->getShopwareOrderByNumber($this->getOrderNumber());
+
+            $this->handleTransactionStatus($transaction['status'], $gatewayId, $order);
+            Shopware()->Session()->offsetUnset('prexxPaymentPayrexx');
         }
 
         $this->redirect(['controller' => 'checkout', 'action' => 'finish']);
@@ -140,11 +159,20 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
      */
     public function cancelAction()
     {
-        /** @var Order|null $order */
+        /** @var ConfigService $configService */
+        $configService = $this->container->get('prexx_payment_payrexx.config_service');
+        $config = $configService->getConfig();
 
+        /** @var OrderService $orderService */
         $orderService = $this->container->get('prexx_payment_payrexx.order_service');
-        $order = $orderService->getShopwareOrderByNumber($this->getOrderNumber());
 
+        if (!$config['orderBeforePayment']) {
+            $this->redirect(['controller' => 'checkout', 'action' => 'finish']);
+            return;
+        }
+
+        /** @var Order|null $order */
+        $order = $orderService->getShopwareOrderByNumber($this->getOrderNumber());
 
         if ($order instanceof Order) {
             $orderService->restoreCartFromOrder($order);
@@ -155,27 +183,37 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
 
     public function webhookAction()
     {
+        /** @var ConfigService $configService */
+        $configService = $this->container->get('prexx_payment_payrexx.config_service');
+        $config = $configService->getConfig();
+
+        /** @var OrderService $orderService */
         $orderService = $this->container->get('prexx_payment_payrexx.order_service');
-        $payrexxApiService = $this->container->get('prexx_payment_payrexx.payrexx_gateway_service');
+
+        /** @var PayrexxGatewayService $gatewayService */
+        $gatewayService = $this->container->get('prexx_payment_payrexx.payrexx_gateway_service');
 
         $requestTransaction = $this->request()->getParam('transaction');
-        $swOrderId = $requestTransaction['referenceId'];
         $requestGatewayId = $requestTransaction['invoice']['paymentRequestId'];
         $requestTransactionStatus = $requestTransaction['status'];
 
         // check required data
-        if (!$swOrderId || !$requestTransactionStatus) {
+        if (!$requestTransactionStatus) {
             throw new \Exception('Payrexx Webhook Data incomplete');
         }
 
-        $order = $orderService->getShopwareOrderByNumber($swOrderId);
+        $order = $orderService->getShopwareOrderByGatewayID($requestGatewayId);
         if (!$order instanceof Order) {
-            throw new \Exception('No order found with ID ' . $swOrderId);
+            if (!$config['orderBeforePayment']) {
+                // Probably no order exists yet and no error should be thrown
+                 die;
+            }
+            throw new \Exception('No order found with paymentID ' . $requestGatewayId);
         }
         if (!$order->getTransactionId() == $requestGatewayId) {
             throw new \Exception('Transaction ID ('.$order->getTransactionId().') does not match requests gateway ID ( '.$requestGatewayId.')');
         }
-        $transaction = $payrexxApiService->getTransaction($requestTransaction['id']);
+        $transaction = $gatewayService->getTransaction($requestTransaction['id']);
 
         if ($requestTransactionStatus != $transaction->getStatus()) {
             throw new \Exception('Corrupt webhook status');

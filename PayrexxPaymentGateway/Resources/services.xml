@@ -8,5 +8,7 @@
         <service id="prexx_payment_payrexx.order_service" class="PayrexxPaymentGateway\Components\Services\OrderService">
             <argument type="service" id="models"/>
         </service>
+        <service id="prexx_payment_payrexx.config_service" class="PayrexxPaymentGateway\Components\Services\ConfigService">
+        </service>
     </services>
 </container>

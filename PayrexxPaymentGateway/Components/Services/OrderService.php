@@ -67,6 +67,24 @@ class OrderService
 
         return $order;
     }
+
+    /**
+     * @param $orderNumber
+     * @return Order
+     */
+    public function getShopwareOrderByGatewayID($gatewayId)
+    {
+        /** @var \Shopware\Models\Order\Repository $orderRepo */
+        $orderRepo = $this->modelManager->getRepository(Order::class);
+
+        /** @var Order $order */
+        $order = $orderRepo->findOneBy([
+            'transactionId' => $gatewayId
+        ]);
+
+        return $order;
+    }
+
     /**
      * @param $orderNumber
      * @return Order
@@ -228,7 +246,7 @@ class OrderService
      * @param Detail $orderDetail
      * @throws Zend_Db_Adapter_Exception
      */
-    function addAttributes($id, Detail $orderDetail)
+    private function addAttributes($id, Detail $orderDetail)
     {
         // load all order basket attributes
         $orderBasketAttributes = $this->getOrderBasketAttributes($id);
