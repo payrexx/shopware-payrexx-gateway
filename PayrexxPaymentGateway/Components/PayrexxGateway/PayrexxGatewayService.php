@@ -114,19 +114,6 @@ class PayrexxGatewayService
         return new \Payrexx\Payrexx($config['instanceName'], $config['apiKey']);
     }
 
-    public function getConfig() {
-        $shop = false;
-        if (Shopware()->Container()->initialized('shop')) {
-            $shop = Shopware()->Container()->get('shop');
-        }
-
-        if (!$shop) {
-            $shop = Shopware()->Container()->get('models')->getRepository(\Shopware\Models\Shop\Shop::class)->getActiveDefault();
-        }
-
-        return Shopware()->Container()->get('shopware.plugin.cached_config_reader')->getByPluginName('PayrexxPaymentGateway', $shop);
-    }
-
     /**
      * Create a checkout page in Payrexx (Payrexx Gateway)
      *
@@ -141,7 +128,7 @@ class PayrexxGatewayService
      * @return Gateway
      *
      */
-    public function createPayrexxGateway($orderNumber, $amount, $currency, $paymentMean, $user, $urls, $basket, $shippingAmount = 0)
+    public function createPayrexxGateway($orderNumber, $totalAmount, $currency, $paymentMean, $user, $urls, $basket, $shippingAmount = 0)
     {
         $billingInformation = $user['billingaddress'];
 
@@ -149,9 +136,41 @@ class PayrexxGatewayService
             $shippingAmount = $shippingAmount * 100;
         }
 
+        $products = [];
+        $shopwareConfig = Shopware()->Config();
+        $amountNet = $shopwareConfig->get('sARTICLESOUTPUTNETTO');
+        $basketAmount = 0;
+        if (!empty($basket) && !empty($basket['content'])) {
+            foreach ($basket['content'] as $item) {
+                $amount = (float)$item['priceNumeric'];
+                $tax = (float)str_replace(',', '.', $item['tax']);
+                if ($amountNet) {
+                    $amount += $tax;
+                }
+
+                $products[] = [
+                    'name' => $item['articlename'],
+                    'description' => $item['additional_details']['description'] ?: '',
+                    'quantity' => $item['quantity'],
+                    'amount' => $amount * 100,
+                    'sku' => $item['ordernumber'],
+                ];
+                $basketAmount += $amount;
+            }
+        }
+
+        if (!empty($shippingAmount)) {
+            $products[] = [
+                'name' => 'Shipping',
+                'amount' => $shippingAmount,
+                'quantity' => 1
+            ];
+            $basketAmount += $shippingAmount;
+        }
+
         $payrexx = $this->getInterface();
         $gateway = new \Payrexx\Models\Request\Gateway();
-        $gateway->setAmount($amount * 100);
+        $gateway->setAmount($totalAmount * 100);
         $gateway->setCurrency($currency);
         $gateway->setSuccessRedirectUrl($urls['successUrl']);
         $gateway->setFailedRedirectUrl($urls['errorUrl']);
@@ -161,7 +180,11 @@ class PayrexxGatewayService
         $gateway->setPsp(array());
         $gateway->setPm(array($paymentMean));
         $gateway->setReferenceId($orderNumber);
-        $gateway->setValidity(60);
+        $gateway->setValidity(15);
+
+        if (!empty($products) && $basketAmount === $totalAmount) {
+            $gateway->setBasket($products);
+        }
 
         $gateway->addField('forename', $billingInformation['firstname']);
         $gateway->addField('surname', $billingInformation['lastname']);
@@ -180,33 +203,6 @@ class PayrexxGatewayService
         }
         if (!empty($country)) {
             $gateway->addField('country', $country);
-        }
-
-        $products = [];
-        if (!empty($basket) && !empty($basket['content'])) {
-            foreach ($basket['content'] as $item) {
-                $amount = floatval($item['priceNumeric']);
-
-                $products[] = [
-                    'name' => $item['articlename'],
-                    'description' => $item['additional_details']['description'] ?: '',
-                    'quantity' => $item['quantity'],
-                    'amount' => $amount * 100,
-                    'sku' => $item['ordernumber'],
-                ];
-            }
-        }
-
-        if (!empty($shippingAmount)) {
-            $products[] = [
-                'name' => 'Versandkosten',
-                'amount' => $shippingAmount,
-                'quantity' => 1
-            ];
-        }
-
-        if (!empty($products)) {
-            $gateway->setBasket($products);
         }
 
 

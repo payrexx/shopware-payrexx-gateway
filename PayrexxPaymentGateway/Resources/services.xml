@@ -5,10 +5,10 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="prexx_payment_payrexx.order_service" class="PayrexxPaymentGateway\Components\Services\OrderService">
+        <service id="prexx_payment_payrexx.order_service" class="PayrexxPaymentGateway\Components\Services\OrderService" public="true">
             <argument type="service" id="models"/>
         </service>
-        <service id="prexx_payment_payrexx.config_service" class="PayrexxPaymentGateway\Components\Services\ConfigService">
+        <service id="prexx_payment_payrexx.config_service" class="PayrexxPaymentGateway\Components\Services\ConfigService" public="true">
         </service>
     </services>
 </container>
