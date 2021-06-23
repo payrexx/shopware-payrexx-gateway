@@ -43,7 +43,6 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
         // Workaround if amount is 0
         if ($this->getAmount() <= 0) {
             $this->saveOrder(time(), $this->createPaymentUniqueId(), Status::PAYMENT_STATE_COMPLETELY_PAID);
-            Shopware()->Session()->offsetUnset('prexxPaymentPayrexx');
             $this->redirect(['controller' => 'checkout', 'action' => 'finish']);
             return;
         }
@@ -59,7 +58,7 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
             $orderService->addTransactionIdToOrder($this->getOrderNumber(), $payrexxGateway->getId());
         }
 
-        Shopware()->Session()->prexxPaymentPayrexx['gatewayId'] = $payrexxGateway->getId();
+        $this->container->get('session')->offsetSet('payrexxGatewayId', $payrexxGateway->getId());
         // Create Payrexx Gateway link for checkout and redirect user
         $providerUrl = $this->getProviderUrl();
         $this->redirect($providerUrl . '?payment=' . $payrexxGateway->getHash());
@@ -128,8 +127,7 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
         /** @var OrderService $orderService */
         $orderService = $this->container->get('prexx_payment_payrexx.order_service');
 
-        $gatewayId = Shopware()->Session()->prexxPaymentPayrexx['gatewayId'];
-        $transaction = $gatewayService->getPayrexxTransactionByGatewayID($gatewayId);
+        $gatewayId = $this->container->get('session')->offsetGet('payrexxGatewayId');
         if ($transaction = $gatewayService->getPayrexxTransactionByGatewayID($gatewayId)) {
 
 
@@ -147,7 +145,7 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
             $order = $orderService->getShopwareOrderByNumber($this->getOrderNumber());
 
             $this->handleTransactionStatus($transaction['status'], $gatewayId, $order);
-            Shopware()->Session()->offsetUnset('prexxPaymentPayrexx');
+            $this->container->get('session')->offsetUnset('payrexxGatewayId');
         }
 
         $this->redirect(['controller' => 'checkout', 'action' => 'finish']);
