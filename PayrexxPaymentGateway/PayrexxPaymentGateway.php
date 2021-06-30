@@ -19,6 +19,7 @@ use Shopware\Models\Order\Order;
 class PayrexxPaymentGateway extends Plugin
 {
     const PAYMENT_MEAN_PREFIX = 'payment_payrexx_';
+    const PAYMENT_MEAN_APPLE_PAY = 'apple_pay';
 
     public static function getSubscribedEvents()
     {
@@ -34,8 +35,30 @@ class PayrexxPaymentGateway extends Plugin
 
     public function onPostDispatch(\Enlight_Event_EventArgs $args)
     {
+        $request = $args->getSubject()->Request();
+        $response = $args->getSubject()->Response();
+
+        /** @var Enlight_View_Default $view */
+        $view = $args->getSubject()->View();
+
+        if (!$request->isDispatched() || $response->isException()
+            || $request->getModuleName() !== 'frontend'
+            || !$view->hasTemplate()
+        ) {
+            return;
+        }
+
         $controller = $args->getSubject();
         $controller->View()->addTemplateDir($this->getPath() . '/Resources/views/');
+
+        $applePayActive = false;
+        foreach (Shopware()->Modules()->Admin()->sGetPaymentMeans() as $paymentMean) {
+            if ($paymentMean['name'] !== (self::PAYMENT_MEAN_PREFIX . self::PAYMENT_MEAN_APPLE_PAY)) continue;
+            $applePayActive = true;
+        }
+        if (!$applePayActive) {
+            return;
+        }
         $controller->View()->extendsTemplate('frontend/header.tpl');
     }
 
@@ -151,9 +174,9 @@ class PayrexxPaymentGateway extends Plugin
         $oldOrderStatus = $statusBefore->getId();
         $transactionIds = $order->getTransactionId();
         $transactionIds = explode("_", $transactionIds);
-        if($transactionIds && is_array($transactionIds)) $transactionId = $transactionIds[1];
+        if ($transactionIds && is_array($transactionIds)) $transactionId = $transactionIds[1];
 
-        if($transactionId && ($oldOrderStatus !== $newOrderStatus) && $newOrderStatus == 7){
+        if ($transactionId && ($oldOrderStatus !== $newOrderStatus) && $newOrderStatus == 7) {
 
             /** @var PayrexxGatewayService $service */
             $service = $this->container->get('prexx_payment_payrexx.payrexx_gateway_service');
