@@ -60,20 +60,7 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
 
         $this->container->get('session')->offsetSet('payrexxGatewayId', $payrexxGateway->getId());
         // Create Payrexx Gateway link for checkout and redirect user
-        $providerUrl = $this->getProviderUrl();
-        $this->redirect($providerUrl . '?payment=' . $payrexxGateway->getHash());
-    }
-
-    /**
-     * @return string Get the base URL for the Payrexx Gateway checkout page by instanceName setting
-     */
-    private function getProviderUrl()
-    {
-        /** @var ConfigService $configService */
-        $configService = $this->container->get('prexx_payment_payrexx.config_service');
-        $config = $configService->getConfig();
-
-        return 'https://' . $config['instanceName'] . '.payrexx.com/';
+        $this->redirect($payrexxGateway->getLink());
     }
 
     /**

@@ -2,40 +2,52 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/shopware/5.2/engine/Shopware/Components/Plugin/schema/config.xsd">
     <elements>
+        <element type="select" scope="shop">
+            <name>platform</name>
+            <label>Platform</label>
+            <label lang="de">Plattform</label>
+            <value>payrexx.com</value>
+            <store>
+                <option>
+                    <value>payrexx.com</value>
+                    <label>Payrexx</label>
+                </option>
+                <option>
+                    <value>shop-and-pay.com</value>
+                    <label>Shop and Pay</label>
+                </option>
+            </store>
+        </element>
         <element required="true" type="text" scope="shop">
             <name>instanceName</name>
-            <label lang="en">Instance name</label>
+            <label>Instance name</label>
+            <label lang="de">Instanz Name</label>
             <description>The instance name of the Payrexx shop</description>
         </element>
         <element required="true" type="text" scope="shop">
             <name>apiKey</name>
-            <label lang="en">API Key</label>
-            <description>The API key you find in your Payrexx merchant backend</description>
-        </element>
-        <element required="true" type="text" scope="shop">
-            <name>apiKey</name>
-            <label lang="en">API Key</label>
+            <label>API Key</label>
+            <label lang="de">API Key</label>
             <description>The API key you find in your Payrexx merchant backend</description>
         </element>
 
         <element type="select" scope="shop">
             <name>orderBeforePayment</name>
-            <label lang="en">Create order before redirecting to Payrexx</label>
-            <value>yes</value>
-            <description lang="en">Only when the order is created before redirecting, the Webhook functionality of Payrexx can be fully used. Also the order number can only in this case be sent to the Payrexx System.</description>
+            <label>Create order before redirecting to Payrexx</label>
+            <label lang="de">Erstellung der Bestellung vor der Weiterleitung zu Payrexx</label>
+            <value>1</value>
+            <description>Only when the order is created before redirecting, the Webhook functionality of Payrexx can be fully used. Also the order number can only in this case be sent to the Payrexx System.</description>
+            <description lang="de">Nur wenn die Bestellung vor der Weiterleitung erstellt wird, kann die Webhook-Funktionalität von Payrexx voll genutzt werden. Auch die Bestellnummer kann nur in diesem Fall an das Payrexx System gesendet werden.</description>
             <store>
                 <option>
                     <value>1</value>
-                    <label lang="en">Yes</label>
+                    <label>Yes</label>
                 </option>
                 <option>
                     <value>0</value>
-                    <label lang="en">No</label>
+                    <label>No</label>
                 </option>
             </store>
-            <options>
-                <position>9</position>
-            </options>
         </element>
     </elements>
 </config>

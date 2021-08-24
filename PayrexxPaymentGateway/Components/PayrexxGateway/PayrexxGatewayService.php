@@ -62,13 +62,13 @@ class PayrexxGatewayService
         }
 
         $payrexx = $this->getInterface();
-        $gateway = new \Payrexx\Models\Request\Transaction();
-        $gateway->setId($transactionId);
+        $transactionReq = new \Payrexx\Models\Request\Transaction();
+        $transactionReq->setId($transactionId);
 
         try {
             /** @var \Payrexx\Models\Request\Transaction $transaction */
-            $transaction = $payrexx->getOne($gateway);
-            if($transaction){
+            $transaction = $payrexx->getOne($transactionReq);
+            if ($transaction) {
                 return $transaction;
             }
         } catch (\Payrexx\PayrexxException $e) {
@@ -95,7 +95,6 @@ class PayrexxGatewayService
 
         try {
             $response = $payrexx->capture($transaction);
-            //var_dump($response);
             return $response;
         } catch (\Payrexx\PayrexxException $e) {
             return $e->getMessage();
@@ -111,7 +110,8 @@ class PayrexxGatewayService
         $configService = Shopware()->Container()->get('prexx_payment_payrexx.config_service');
         $config = $configService->getConfig();
 
-        return new \Payrexx\Payrexx($config['instanceName'], $config['apiKey']);
+        $platform = !empty($config['platform']) ? $config['platform'] : '';
+        return new \Payrexx\Payrexx($config['instanceName'], $config['apiKey'], '', $platform);
     }
 
     /**
