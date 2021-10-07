@@ -16,6 +16,10 @@
                     <value>shop-and-pay.com</value>
                     <label>Shop and Pay</label>
                 </option>
+                <option>
+                    <value>ideal-pay.ch</value>
+                    <label>Ideal Pay</label>
+                </option>
             </store>
         </element>
         <element required="true" type="text" scope="shop">
