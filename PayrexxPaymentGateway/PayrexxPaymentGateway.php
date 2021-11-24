@@ -135,6 +135,7 @@ class PayrexxPaymentGateway extends Plugin
             'wechat-pay' => 'WeChat Pay',
             'alipay' => 'Alipay',
             'samsung_pay' => 'Samsung Pay',
+            'ideal_payment' => 'ideal Payment',
         );
         foreach ($paymentMethods as $name => $paymentMethod) {
             $options = array(

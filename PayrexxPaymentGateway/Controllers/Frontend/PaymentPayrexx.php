@@ -233,7 +233,7 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
         }
 
         try {
-            $this->savePaymentStatus($requestGatewayId, $order->getTemporaryId(), $status, true);
+            $this->savePaymentStatus($requestGatewayId, $order->getTemporaryId(), $status);
         } catch(\Payrexx\PayrexxException $e) {
             throw new \Exception('Saving payment status failed');
         }

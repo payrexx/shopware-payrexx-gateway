@@ -132,10 +132,6 @@ class PayrexxGatewayService
     {
         $billingInformation = $user['billingaddress'];
 
-        if (!empty($shippingAmount)) {
-            $shippingAmount = $shippingAmount * 100;
-        }
-
         $products = [];
         $shopwareConfig = Shopware()->Config();
         $amountNet = $shopwareConfig->get('sARTICLESOUTPUTNETTO');
@@ -155,14 +151,14 @@ class PayrexxGatewayService
                     'amount' => $amount * 100,
                     'sku' => $item['ordernumber'],
                 ];
-                $basketAmount += $amount;
+                $basketAmount += $amount * $item['quantity'];
             }
         }
 
         if (!empty($shippingAmount)) {
             $products[] = [
                 'name' => 'Shipping',
-                'amount' => $shippingAmount,
+                'amount' => $shippingAmount * 100,
                 'quantity' => 1
             ];
             $basketAmount += $shippingAmount;
