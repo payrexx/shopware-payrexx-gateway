@@ -20,6 +20,10 @@
                     <value>ideal-pay.ch</value>
                     <label>Ideal Pay</label>
                 </option>
+                <option>
+                    <value>payzzter.com</value>
+                    <label>Payzzter</label>
+                </option>
             </store>
         </element>
         <element required="true" type="text" scope="shop">
