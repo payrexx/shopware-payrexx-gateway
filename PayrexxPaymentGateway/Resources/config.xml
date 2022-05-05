@@ -24,6 +24,10 @@
                     <value>payzzter.com</value>
                     <label>Payzzter</label>
                 </option>
+                <option>
+                    <value>go2flow.finance</value>
+                    <label>Go2Flow</label>
+                </option>
             </store>
         </element>
         <element required="true" type="text" scope="shop">
