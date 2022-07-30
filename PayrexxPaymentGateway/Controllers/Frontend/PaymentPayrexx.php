@@ -161,6 +161,9 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
 
         if ($order instanceof Order) {
             $orderService->restoreCartFromOrder($order);
+            $orderVariables = Shopware()->Session()->get('sOrderVariables');
+            $orderVariables['sOrderNumber'] = null;
+            Shopware()->Session()->set('sOrderVariables', $orderVariables);
         }
 
         $this->redirect(['controller' => 'checkout', 'action' => 'payment']);
