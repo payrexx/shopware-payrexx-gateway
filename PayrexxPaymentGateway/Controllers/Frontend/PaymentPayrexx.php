@@ -215,6 +215,9 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
                 $status = Status::PAYMENT_STATE_COMPLETELY_PAID;
                 break;
             case \Payrexx\Models\Response\Transaction::WAITING:
+                if ($order->getPaymentStatus()->getId() === Status::PAYMENT_STATE_COMPLETELY_PAID) {
+                    return;
+                }
                 $status = Status::PAYMENT_STATE_OPEN;
                 break;
             case \Payrexx\Models\Response\Transaction::REFUNDED:
@@ -222,8 +225,12 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
                 $status = Status::PAYMENT_STATE_RE_CREDITING;
                 break;
             case \Payrexx\Models\Response\Transaction::CANCELLED:
+            case \Payrexx\Models\Response\Transaction::DECLINED:
             case \Payrexx\Models\Response\Transaction::EXPIRED:
             case \Payrexx\Models\Response\Transaction::ERROR:
+                if ($order->getPaymentStatus()->getId() === Status::PAYMENT_STATE_COMPLETELY_PAID) {
+                    return;
+                }
                 $status = Status::PAYMENT_STATE_THE_PROCESS_HAS_BEEN_CANCELLED;
                 break;
         }
