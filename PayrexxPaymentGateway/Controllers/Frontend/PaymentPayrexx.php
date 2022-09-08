@@ -52,7 +52,7 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
         }
 
         // Get the Payrexx Gateway object
-        $payrexxGateway = $this->getPayrexxGateway();
+        $payrexxGateway = $this->createPayrexxGateway();
 
         if ($config['orderBeforePayment']) {
             $orderService->addTransactionIdToOrder($this->getOrderNumber(), $payrexxGateway->getId());
@@ -67,7 +67,7 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
      * Create a Payrexx Gateway with Payrexx API
      * @return Payrexx\Models\Response\Gateway
      */
-    private function getPayrexxGateway()
+    private function createPayrexxGateway()
     {
         /** @var PayrexxGatewayService $gatewayService */
         $gatewayService = $this->container->get('prexx_payment_payrexx.payrexx_gateway_service');
@@ -115,12 +115,11 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
         $orderService = $this->container->get('prexx_payment_payrexx.order_service');
 
         $gatewayId = $this->container->get('session')->offsetGet('payrexxGatewayId');
-        if ($transaction = $gatewayService->getPayrexxTransactionByGatewayID($gatewayId)) {
 
-
-            if (!$transaction || !$transaction['uuid']) {
-                $this->redirect(['controller' => 'checkout', 'action' => 'finish']);
-            }
+        if (!$gateway = $gatewayService->getPayrexxGateway($gatewayId)) {
+            $this->redirect(['controller' => 'checkout', 'action' => 'finish']);
+        }
+        if ($transaction = $gatewayService->getPayrexxTransactionByGateway($gateway)) {
 
             if (!$config['orderBeforePayment']) {
                 $this->saveOrder(
@@ -131,7 +130,7 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
             }
             $order = $orderService->getShopwareOrderByNumber($this->getOrderNumber());
 
-            $this->handleTransactionStatus($transaction['status'], $gatewayId, $order);
+            $this->handleTransactionStatus($transaction->getStatus(), $gatewayId, $order);
             $this->container->get('session')->offsetUnset('payrexxGatewayId');
         }
 

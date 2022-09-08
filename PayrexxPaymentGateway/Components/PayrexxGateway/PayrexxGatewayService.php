@@ -11,20 +11,21 @@
 namespace PayrexxPaymentGateway\Components\PayrexxGateway;
 
 use Payrexx\Models\Response\Gateway;
+use Payrexx\Models\Response\Transaction;
 use PayrexxPaymentGateway\Components\Services\ConfigService;
 
 class PayrexxGatewayService
 {
 
     /**
-     * get the Payrexx Transaction
-     * @param $gatewayId
-     * @return bool|string
+     *
+     * @param int $gatewayId
+     * @return \Payrexx\Models\Response\Gateway|null
      */
-    public function getPayrexxTransactionByGatewayID($gatewayId)
+    public function getPayrexxGateway($gatewayId)
     {
         if (!$gatewayId) {
-            return false;
+            return null;
         }
 
         $payrexx = $this->getInterface();
@@ -32,22 +33,34 @@ class PayrexxGatewayService
         $gateway->setId($gatewayId);
 
         try {
-            /** @var \Payrexx\Models\Request\Gateway $gateway */
-            $gateway = $payrexx->getOne($gateway);
-            if($gateway){
-                $invoices = $gateway->getInvoices();
-                if($invoices && $invoices[0]){
-                    $invoice = $invoices[0];
-                    $transactions = $invoice['transactions'];
-                    if($transactions && $transactions[0]){
-                        return $transactions[0];
-                    }
-                }
-            }
+            return $payrexx->getOne($gateway);
         } catch (\Payrexx\PayrexxException $e) {
-            return $e->getMessage();
         }
-        return false;
+        return null;
+    }
+
+    /**
+     * get the Payrexx Transaction
+     * @param $gatewayId
+     * @return bool|string
+     */
+    public function getPayrexxTransactionByGateway($gateway)
+    {
+        if (!in_array($gateway->getStatus(), [Transaction::CONFIRMED, Transaction::WAITING])) {
+            return false;
+        }
+
+        $invoices = $gateway->getInvoices();
+
+        if (!$invoices || !$invoice = end($invoices)) {
+            return null;
+        }
+
+        if (!$transactions = $invoice['transactions']) {
+            return null;
+        }
+
+        return $this->getTransaction(end($transactions)['id']);
     }
 
     /**
