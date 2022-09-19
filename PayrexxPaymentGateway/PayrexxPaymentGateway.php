@@ -8,6 +8,7 @@
 
 namespace PayrexxPaymentGateway;
 
+use Payrexx\Models\Response\Transaction;
 use PayrexxPaymentGateway\Components\PayrexxGateway\PayrexxGatewayService;
 use Shopware\Components\Plugin;
 use Shopware\Components\Plugin\Context\ActivateContext;
@@ -185,8 +186,8 @@ class PayrexxPaymentGateway extends Plugin
             /** @var \Payrexx\Models\Request\Transaction $transaction */
             $transaction = $service->getTransaction($transactionId);
 
-            if ($transaction instanceof \Payrexx\Models\Request\Transaction && $transaction->getStatus() == 'uncaptured') {
-                $status = $service->captureTransaction($transactionId);
+            if ($transaction instanceof \Payrexx\Models\Request\Transaction && $transaction->getStatus() == Transaction::UNCAPTURED) {
+                $service->captureTransaction($transactionId);
             }
         }
     }

@@ -11,11 +11,11 @@
 
     <link>https://www.payrexx.com</link>
     <author>Payrexx AG</author>
-    <compatibility minVersion="5.2.0" />
+    <compatibility minVersion="5.4.0" />
 
     <changelog version="1.0.22">
         <changes lang="de">Improvement Bestellungserstellung vor Weiterleitung: Der korrekte Transaktionsstatus kann nun auch im Falle von mehreren Transaktionsversuchen</changes>
-        <changes lang="en">Improvement order creation before forwarding: The correct transaction status can now be determined also in case of multiple transaction attempts.</changes>
+        <changes lang="en">Improvement order creation before forwarding: The correct transaction status can now be determined also in case of multiple transaction attempts</changes>
     </changelog>
     <changelog version="1.0.21">
         <changes lang="de">Improvement: Es wurden Status Transition Regeln eingeführt; Im Fall einer abgebrochenen Zahlung und einem erneuten Zahlungsversuch wird nun eine neue Bestellung angelegt.</changes>
