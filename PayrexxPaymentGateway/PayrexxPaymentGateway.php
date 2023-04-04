@@ -23,6 +23,7 @@ class PayrexxPaymentGateway extends Plugin
 {
     const PAYMENT_MEAN_PREFIX = 'payment_payrexx_';
     const PAYMENT_MEAN_APPLE_PAY = 'apple_pay';
+    const PAYMENT_MEAN_GOOGLE_PAY = 'google_pay';
 
     public static function getSubscribedEvents()
     {
@@ -55,14 +56,18 @@ class PayrexxPaymentGateway extends Plugin
         $controller->View()->addTemplateDir($this->getPath() . '/Resources/views/');
 
         $applePayActive = false;
+        $googlePayActive = false;
         foreach (Shopware()->Modules()->Admin()->sGetPaymentMeans() as $paymentMean) {
-            if ($paymentMean['name'] !== (self::PAYMENT_MEAN_PREFIX . self::PAYMENT_MEAN_APPLE_PAY)) continue;
-            $applePayActive = true;
+            if ($paymentMean['name'] === (self::PAYMENT_MEAN_PREFIX . self::PAYMENT_MEAN_APPLE_PAY)) {
+                $applePayActive = true;
+            }
+            if ($paymentMean['name'] === (self::PAYMENT_MEAN_PREFIX . self::PAYMENT_MEAN_APPLE_PAY)) {
+                $googlePayActive = true;
+            }
+            $view->assign('payrexx-payment-method', $paymentMean['name']);
         }
-        if (!$applePayActive) {
-            return;
-        }
-        $controller->View()->extendsTemplate('frontend/header.tpl');
+        $view->assign('applePayActive', $applePayActive);
+        $view->assign('googlePayActive', $googlePayActive);
     }
 
     public function onRegisterSubscriber(\Enlight_Event_EventArgs $args)
