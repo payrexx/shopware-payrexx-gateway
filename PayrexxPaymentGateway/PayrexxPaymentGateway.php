@@ -23,7 +23,7 @@ class PayrexxPaymentGateway extends Plugin
 {
     const PAYMENT_MEAN_PREFIX = 'payment_payrexx_';
     const PAYMENT_MEAN_APPLE_PAY = 'apple_pay';
-    const PAYMENT_MEAN_GOOGLE_PAY = 'google_pay';
+    const PAYMENT_MEAN_GOOGLE_PAY = 'google-pay';
 
     public static function getSubscribedEvents()
     {
@@ -61,7 +61,7 @@ class PayrexxPaymentGateway extends Plugin
             if ($paymentMean['name'] === (self::PAYMENT_MEAN_PREFIX . self::PAYMENT_MEAN_APPLE_PAY)) {
                 $applePayActive = true;
             }
-            if ($paymentMean['name'] === (self::PAYMENT_MEAN_PREFIX . self::PAYMENT_MEAN_APPLE_PAY)) {
+            if ($paymentMean['name'] === (self::PAYMENT_MEAN_PREFIX . self::PAYMENT_MEAN_GOOGLE_PAY)) {
                 $googlePayActive = true;
             }
             $view->assign('payrexx-payment-method', $paymentMean['name']);

@@ -1,20 +1,8 @@
 (function ($) {
     'use strict';
 
-    var deviceSupported = false;
     $(document).ready(function() {
-        deviceSupported = checkDeviceSupport();
-    });
-    $(document).on("DOMNodeInserted", function(e) {
-        displayGooglePay();
-    });
-
-    /**
-     * Check Device support the payment method
-     *
-     * @returns bool
-     */
-    function checkDeviceSupport() {
+        $(".payment-mean-payment-payrexx-google-pay-label").parent().parent('.payment--method').hide();
         try {
             const baseRequest = {
                 apiVersion: 2,
@@ -41,28 +29,21 @@
             );
             paymentsClient.isReadyToPay(isReadyToPayRequest).then(function(response) {
                 if (response.result) {
-                    return true;
+                    $(".payment-mean-payment-payrexx-google-pay-label").parent().parent('.payment--method').show();
+                } else {
+                    showConsoleWarning();
                 }
             }).catch(function(err) {
+                showConsoleWarning();
                 console.log(err);
             });
-            return false;
         } catch (err) {
+            showConsoleWarning();
             console.log(err);
         }
-        return false;
-    }
 
-    /**
-     * Display the payment method
-     *
-     * @returns bool
-     */
-    function displayGooglePay() {
-        if (deviceSupported) {
-            console.warn("Payrexx GooglePay is not supported on this device/browser");
-            return;
+        function showConsoleWarning() {
+            console.warn("Payrexx Google Pay is not supported on this device/browser");
         }
-        $(".payment-mean-payment-payrexx-google-pay-label").parent().parent('.payment--method').remove();
-    }
+    });
 }(jQuery));
