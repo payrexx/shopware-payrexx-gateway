@@ -11,6 +11,5 @@
     {if $googlePayActive}
         <script src="https://pay.google.com/gp/p/js/pay.js"></script>
         <script async src="{link file='frontend/_public/src/js/googlepay.js' fullPath}"></script>
-    </script>
     {/if}
 {/block}
