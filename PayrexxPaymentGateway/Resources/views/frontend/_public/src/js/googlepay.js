@@ -2,14 +2,25 @@
     'use strict';
 
     $(document).ready(function() {
-        $(".payment-mean-payment-payrexx-google-pay-label").parent().parent('.payment--method').hide();
+        checkGooglePaySupport();
+    });
+
+    $(document).on("DOMNodeInserted", function(e) {
+        checkGooglePaySupport();
+    });
+
+    /**
+     * Check the deive to support google pay.
+     */
+    function checkGooglePaySupport() {
+        $(".payment-payrexx-google-pay-label").parent().parent('.payment--method').hide();
         try {
             const baseRequest = {
                 apiVersion: 2,
                 apiVersionMinor: 0
             };
             const allowedCardNetworks = ['MASTERCARD', 'VISA'];
-            const allowedCardAuthMethods = ['CRYPTOGRAM_3DS'];
+            const allowedCardAuthMethods = ['PAN_ONLY', 'CRYPTOGRAM_3DS'];
             const baseCardPaymentMethod = {
                 type: 'CARD',
                 parameters: {
@@ -29,21 +40,13 @@
             );
             paymentsClient.isReadyToPay(isReadyToPayRequest).then(function(response) {
                 if (response.result) {
-                    $(".payment-mean-payment-payrexx-google-pay-label").parent().parent('.payment--method').show();
-                } else {
-                    showConsoleWarning();
+                    $(".payment-payrexx-google-pay-label").parent().parent('.payment--method').show();
                 }
             }).catch(function(err) {
-                showConsoleWarning();
                 console.log(err);
             });
         } catch (err) {
-            showConsoleWarning();
             console.log(err);
         }
-
-        function showConsoleWarning() {
-            console.warn("Payrexx Google Pay is not supported on this device/browser");
-        }
-    });
+    }
 }(jQuery));

@@ -2,9 +2,19 @@
     'use strict';
 
     $(document).ready(function() {
-        if ((window.ApplePaySession && ApplePaySession.canMakePayments()) !== true) {
-            $(".payment-mean-payment-payrexx-apple-pay-label").parent().parent('.payment--method').hide();
-            console.warn("Payrexx Apple Pay is not supported on this device/browser");
-        }
+        checkApplePaySupport();
     });
+
+    $(document).on("DOMNodeInserted", function(e) {
+        checkApplePaySupport();
+    });
+
+    /**
+     * Check the deive to support apple pay.
+     */
+    function checkApplePaySupport() {
+       if ((window.ApplePaySession && ApplePaySession.canMakePayments()) !== true) {
+            $(".payment-payrexx-apple-pay-label").parent().parent('.payment--method').hide();
+        }
+    }
 }(jQuery));

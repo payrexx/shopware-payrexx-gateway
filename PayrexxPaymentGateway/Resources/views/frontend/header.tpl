@@ -1,6 +1,4 @@
-{extends file='parent:frontend/checkout/shipping_payment.tpl'}
-
-{block name='frontend_index_content'}
+{block name="frontend_index_body_inline"}
     {$smarty.block.parent}
     {if $applePayActive || $googlePayActive}
         <script src="{link file='frontend/_public/src/js/jquery-3.6.4.min.js' fullPath}"></script>

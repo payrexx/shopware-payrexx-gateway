@@ -66,6 +66,9 @@ class PayrexxPaymentGateway extends Plugin
             }
             $view->assign('payrexx-payment-method', $paymentMean['name']);
         }
+        if ($applePayActive || $googlePayActive) {
+            $controller->View()->extendsTemplate('frontend/header.tpl');
+        }
         $view->assign('applePayActive', $applePayActive);
         $view->assign('googlePayActive', $googlePayActive);
     }
