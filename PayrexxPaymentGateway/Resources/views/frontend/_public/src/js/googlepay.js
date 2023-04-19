@@ -20,7 +20,7 @@
                 apiVersionMinor: 0
             };
             const allowedCardNetworks = ['MASTERCARD', 'VISA'];
-            const allowedCardAuthMethods = ['PAN_ONLY', 'CRYPTOGRAM_3DS'];
+            const allowedCardAuthMethods = ['CRYPTOGRAM_3DS'];
             const baseCardPaymentMethod = {
                 type: 'CARD',
                 parameters: {
