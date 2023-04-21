@@ -15,6 +15,7 @@
     function checkApplePaySupport() {
        if ((window.ApplePaySession && ApplePaySession.canMakePayments()) !== true) {
             $(".payment-payrexx-apple-pay-label").parent().parent('.payment--method').hide();
+            $(".payrexx-payment--method-warning").show();
         }
     }
 }(jQuery));

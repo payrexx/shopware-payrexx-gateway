@@ -41,6 +41,8 @@
             paymentsClient.isReadyToPay(isReadyToPayRequest).then(function(response) {
                 if (response.result) {
                     $(".payment-payrexx-google-pay-label").parent().parent('.payment--method').show();
+                } else {
+                    $(".payrexx-payment--method-warning").show();
                 }
             }).catch(function(err) {
                 console.log(err);
