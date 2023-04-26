@@ -15,6 +15,7 @@ use Shopware\Components\Plugin\Context\ActivateContext;
 use Shopware\Components\Plugin\Context\DeactivateContext;
 use Shopware\Components\Plugin\Context\InstallContext;
 use Shopware\Components\Plugin\Context\UninstallContext;
+use Shopware\Components\Plugin\Context\UpdateContext;
 use Shopware\Models\Order\Order;
 
 class PayrexxPaymentGateway extends Plugin
@@ -92,7 +93,21 @@ class PayrexxPaymentGateway extends Plugin
         parent::install($context);
     }
 
-    private function registerPayment(InstallContext $context)
+    /**
+     * {@inheritdoc}
+     */
+    public function update(UpdateContext $context)
+    {
+        $this->registerPayment($context);
+        parent::update($context);
+    }
+
+    /**
+     * Register payment methods
+     *
+     * @param InstallContext|UpdateContext $context
+     */
+    private function registerPayment($context)
     {
         /** @var \Shopware\Components\Plugin\PaymentInstaller $installer */
         $installer = $this->container->get('shopware.plugin_payment_installer');
@@ -137,6 +152,8 @@ class PayrexxPaymentGateway extends Plugin
             'alipay' => 'Alipay',
             'samsung_pay' => 'Samsung Pay',
             'ideal_payment' => 'ideal Payment',
+            'centi' => 'Centi',
+            'heidipay' => 'Heidipay',
         );
         foreach ($paymentMethods as $name => $paymentMethod) {
             $options = array(
