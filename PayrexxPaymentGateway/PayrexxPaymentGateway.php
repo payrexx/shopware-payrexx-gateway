@@ -17,6 +17,7 @@ use Shopware\Components\Plugin\Context\InstallContext;
 use Shopware\Components\Plugin\Context\UninstallContext;
 use Shopware\Components\Plugin\Context\UpdateContext;
 use Shopware\Models\Order\Order;
+use Shopware\Models\Payment\Payment;
 
 class PayrexxPaymentGateway extends Plugin
 {
@@ -155,9 +156,20 @@ class PayrexxPaymentGateway extends Plugin
             'centi' => 'Centi',
             'heidipay' => 'Heidipay',
         );
+
+        $installedPaymentMethods = $this->getInstalledPaymentMethods();
+        if (!empty($installedPaymentMethods)) {
+            $installedPaymentMethods = array_column($installedPaymentMethods, 'name');
+        }
         foreach ($paymentMethods as $name => $paymentMethod) {
+            $paymentMethodName = self::PAYMENT_MEAN_PREFIX . $name;
+            if (!empty($installedPaymentMethods) &&
+                in_array($paymentMethodName, $installedPaymentMethods)
+            ) {
+                continue;
+            }
             $options = array(
-                'name' => self::PAYMENT_MEAN_PREFIX . $name,
+                'name' => $paymentMethodName,
                 'description' => $paymentMethod . ' (Payrexx)',
                 'action' => 'PaymentPayrexx',
                 'active' => 0,
@@ -256,5 +268,19 @@ class PayrexxPaymentGateway extends Plugin
     {
         $this->setActiveFlag($context->getPlugin()->getPayments(), true);
         parent::activate($context);
+    }
+
+    /**
+     * Get existing payment methods
+     */
+    private function getInstalledPaymentMethods()
+    {
+        $modelManager = $this->container->get('models');
+        $qb = $modelManager->createQueryBuilder();
+        $qb->select(['p.name'])
+            ->from(Payment::class, 'p')
+            ->where($qb->expr()->like('p.name', ':namePattern'))
+            ->setParameter(':namePattern', self::PAYMENT_MEAN_PREFIX . '%');
+        return $qb->getQuery()->getResult();
     }
 }
