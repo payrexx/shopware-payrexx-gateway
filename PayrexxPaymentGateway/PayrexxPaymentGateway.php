@@ -154,7 +154,7 @@ class PayrexxPaymentGateway extends Plugin
             'samsung_pay' => 'Samsung Pay',
             'ideal_payment' => 'ideal Payment',
             'centi' => 'Centi',
-            'heidipay' => 'Heidipay',
+            'heidipay' => 'Pay monthly with HeidiPay',
         );
 
         $installedPaymentMethods = $this->getInstalledPaymentMethods();
