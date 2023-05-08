@@ -15,7 +15,9 @@ use Shopware\Components\Plugin\Context\ActivateContext;
 use Shopware\Components\Plugin\Context\DeactivateContext;
 use Shopware\Components\Plugin\Context\InstallContext;
 use Shopware\Components\Plugin\Context\UninstallContext;
+use Shopware\Components\Plugin\Context\UpdateContext;
 use Shopware\Models\Order\Order;
+use Shopware\Models\Payment\Payment;
 
 class PayrexxPaymentGateway extends Plugin
 {
@@ -92,7 +94,21 @@ class PayrexxPaymentGateway extends Plugin
         parent::install($context);
     }
 
-    private function registerPayment(InstallContext $context)
+    /**
+     * {@inheritdoc}
+     */
+    public function update(UpdateContext $context)
+    {
+        $this->registerPayment($context);
+        parent::update($context);
+    }
+
+    /**
+     * Register payment methods
+     *
+     * @param InstallContext|UpdateContext $context
+     */
+    private function registerPayment($context)
     {
         /** @var \Shopware\Components\Plugin\PaymentInstaller $installer */
         $installer = $this->container->get('shopware.plugin_payment_installer');
@@ -137,10 +153,23 @@ class PayrexxPaymentGateway extends Plugin
             'alipay' => 'Alipay',
             'samsung_pay' => 'Samsung Pay',
             'ideal_payment' => 'ideal Payment',
+            'centi' => 'Centi',
+            'heidipay' => 'Pay monthly with HeidiPay',
         );
+
+        $installedPaymentMethods = $this->getInstalledPaymentMethods();
+        if (!empty($installedPaymentMethods)) {
+            $installedPaymentMethods = array_column($installedPaymentMethods, 'name');
+        }
         foreach ($paymentMethods as $name => $paymentMethod) {
+            $paymentMethodName = self::PAYMENT_MEAN_PREFIX . $name;
+            if (!empty($installedPaymentMethods) &&
+                in_array($paymentMethodName, $installedPaymentMethods)
+            ) {
+                continue;
+            }
             $options = array(
-                'name' => self::PAYMENT_MEAN_PREFIX . $name,
+                'name' => $paymentMethodName,
                 'description' => $paymentMethod . ' (Payrexx)',
                 'action' => 'PaymentPayrexx',
                 'active' => 0,
@@ -239,5 +268,19 @@ class PayrexxPaymentGateway extends Plugin
     {
         $this->setActiveFlag($context->getPlugin()->getPayments(), true);
         parent::activate($context);
+    }
+
+    /**
+     * Get existing payment methods
+     */
+    private function getInstalledPaymentMethods()
+    {
+        $modelManager = $this->container->get('models');
+        $qb = $modelManager->createQueryBuilder();
+        $qb->select(['p.name'])
+            ->from(Payment::class, 'p')
+            ->where($qb->expr()->like('p.name', ':namePattern'))
+            ->setParameter(':namePattern', self::PAYMENT_MEAN_PREFIX . '%');
+        return $qb->getQuery()->getResult();
     }
 }
