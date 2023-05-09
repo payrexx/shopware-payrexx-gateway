@@ -170,6 +170,9 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
 
     public function webhookAction()
     {
+        // Disable frontend rendering, since this is a webhook request
+        $this->Front()->Plugins()->ViewRenderer()->setNoRender();
+
         /** @var ConfigService $configService */
         $configService = $this->container->get('prexx_payment_payrexx.config_service');
         $config = $configService->getConfig();
@@ -193,7 +196,7 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
         if (!$order instanceof Order) {
             if (!$config['orderBeforePayment']) {
                 // Probably no order exists yet and no error should be thrown
-                 die;
+                return;
             }
             throw new \Exception('No order found with paymentID ' . $requestGatewayId);
         }
@@ -207,7 +210,6 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
         }
 
         $this->handleTransactionStatus($requestTransactionStatus, $requestGatewayId, $order);
-        die;
     }
 
     private function handleTransactionStatus($requestTransactionStatus,$requestGatewayId, $order) {
