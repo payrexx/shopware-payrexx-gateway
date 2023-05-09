@@ -5,7 +5,7 @@
         checkGooglePaySupport();
     });
 
-    $(document).on("DOMNodeInserted", function(e) {
+    $(document).on("DOMNodeInserted", ".content--wrapper", function(e) {
         checkGooglePaySupport();
     });
 
