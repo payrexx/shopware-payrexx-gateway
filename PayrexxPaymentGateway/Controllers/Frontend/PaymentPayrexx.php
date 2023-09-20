@@ -118,6 +118,7 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
 
         if (!$gateway = $gatewayService->getPayrexxGateway($gatewayId)) {
             $this->redirect(['controller' => 'checkout', 'action' => 'finish']);
+            return;
         }
         if ($transaction = $gatewayService->getPayrexxTransactionByGateway($gateway)) {
 
