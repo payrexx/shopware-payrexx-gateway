@@ -53,6 +53,12 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
 
         // Get the Payrexx Gateway object
         $payrexxGateway = $this->createPayrexxGateway();
+        if (!$payrexxGateway) {
+            $router = $this->Front()->Router();
+            $errorUrl = $router->assemble(array('action' => 'cancel', 'forceSecure' => true));
+            $this->redirect($errorUrl);
+            return;
+        }
 
         if ($config['orderBeforePayment']) {
             $orderService->addTransactionIdToOrder($this->getOrderNumber(), $payrexxGateway->getId());
