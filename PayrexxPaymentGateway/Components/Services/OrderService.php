@@ -6,6 +6,7 @@ use Shopware\Models\Order\Order;
 use Shopware\Models\Order\Status;
 use Shopware\Models\Order\Detail;
 use Shopware\Components\Model\ModelManager;
+use Shopware\Models\Voucher\Voucher;
 
 class OrderService
 {
@@ -86,8 +87,7 @@ class OrderService
     }
 
     /**
-     * @param $orderNumber
-     * @return Order
+     * @param Order $orderNumber
      */
     public function restoreCartFromOrder(Order $order)
     {
