@@ -7,6 +7,7 @@ use Shopware\Models\Order\Status;
 use Shopware\Models\Order\Detail;
 use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Voucher\Voucher;
+use Exception;
 
 class OrderService
 {
