@@ -187,7 +187,7 @@ class OrderService
             $voucher = $voucherRepo->findOneBy([
                 'id' => $voucherId
             ]);
-        } catch (Exception $ex) {
+        } catch (\Exception $ex) {
             $this->logger->error(
                 'Error when loading voucher by ID: ' . $voucherId,
                 array(
@@ -227,7 +227,7 @@ class OrderService
             $result = $q->execute([
                 $orderDetailId,
             ]);
-        } catch (Exception $ex) {
+        } catch (\Exception $ex) {
             $this->logger->error(
                 'Error when removing order detail: ' . $orderDetailId,
                 array(
@@ -345,7 +345,7 @@ class OrderService
         try {
             $this->modelManager->persist($orderDetail);
             $this->modelManager->flush($orderDetail);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             //
         }
 
@@ -359,7 +359,7 @@ class OrderService
             $article = $articleDetailRepository->findOneBy([
                 'number' => $orderDetail->getArticleNumber()
             ]);
-        } catch (Exception $ex) {
+        } catch (\Exception $ex) {
             //
         }
 
@@ -370,7 +370,7 @@ class OrderService
             try {
                 $this->modelManager->persist($article);
                 $this->modelManager->flush($article);
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 //
             }
         }
