@@ -164,6 +164,7 @@ class PayrexxPaymentGateway extends Plugin
             'centi' => 'Centi',
             'heidipay' => 'Pay monthly with HeidiPay',
             'reka' => 'Reka',
+            'bank_transfer' => 'Bank Transfer',
         );
 
         $installedPaymentMethods = $this->getInstalledPaymentMethods();
