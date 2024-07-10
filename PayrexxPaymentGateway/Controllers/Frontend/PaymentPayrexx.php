@@ -89,6 +89,11 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
 
         $paymentMean = str_replace(PayrexxPaymentGateway::PAYMENT_MEAN_PREFIX, '', $this->getPaymentShortName());
 
+        // TO DO: Remove upcoming version release
+        $unavailablePaymentMethods = ['postfinance_card', 'postfinance_efinance'];
+        if (in_array($paymentMean, $unavailablePaymentMethods)) {
+            return false;
+        }
         return $gatewayService->createPayrexxGateway(
             $this->getOrderNumber(),
             $this->getAmount(),
