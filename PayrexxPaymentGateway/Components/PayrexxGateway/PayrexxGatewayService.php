@@ -203,6 +203,14 @@ class PayrexxGatewayService
         $gateway->addField('place', $billingInformation['city']);
         $gateway->addField('email', $user['additional']['user']['email']);
 
+        $shippingAddress = $user['shippingaddress'];
+        $gateway->addField('delivery_forename', $shippingAddress['firstname']);
+        $gateway->addField('delivery_surname', $shippingAddress['lastname']);
+        $gateway->addField('delivery_company', $shippingAddress['company']);
+        $gateway->addField('delivery_street', $shippingAddress['street']);
+        $gateway->addField('delivery_postcode', $shippingAddress['zipcode']);
+        $gateway->addField('delivery_place', $shippingAddress['city']);
+
         // country
         if (!empty($user['additional']['countryShipping']['countryiso'])) {
             $country = $user['additional']['countryShipping']['countryiso'];
