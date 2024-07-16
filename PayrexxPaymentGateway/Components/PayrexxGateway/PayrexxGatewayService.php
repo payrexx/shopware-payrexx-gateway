@@ -195,6 +195,9 @@ class PayrexxGatewayService
             $gateway->setBasket($products);
         }
 
+        $billingCountry = $user['additional']['country']['countryiso'] ?? '';
+        $shippingCountry = $user['additional']['countryShipping']['countryiso'] ?? '';
+
         $gateway->addField('forename', $billingInformation['firstname']);
         $gateway->addField('surname', $billingInformation['lastname']);
         $gateway->addField('company', $billingInformation['company']);
@@ -202,18 +205,16 @@ class PayrexxGatewayService
         $gateway->addField('postcode', $billingInformation['zipcode']);
         $gateway->addField('place', $billingInformation['city']);
         $gateway->addField('email', $user['additional']['user']['email']);
+        $gateway->addField('country', $billingCountry ?? $shippingCountry);
 
-        // country
-        if (!empty($user['additional']['countryShipping']['countryiso'])) {
-            $country = $user['additional']['countryShipping']['countryiso'];
-        }
-        if (empty($country)) {
-            $country = $user['additional']['country']['countryiso'];
-        }
-        if (!empty($country)) {
-            $gateway->addField('country', $country);
-        }
-
+        $shippingAddress = $user['shippingaddress'];
+        $gateway->addField('delivery_forename', $shippingAddress['firstname']);
+        $gateway->addField('delivery_surname', $shippingAddress['lastname']);
+        $gateway->addField('delivery_company', $shippingAddress['company']);
+        $gateway->addField('delivery_street', $shippingAddress['street']);
+        $gateway->addField('delivery_postcode', $shippingAddress['zipcode']);
+        $gateway->addField('delivery_place', $shippingAddress['city']);
+        $gateway->addField('delivery_country', $shippingCountry ?? $billingCountry);
 
         try {
             return $payrexx->create($gateway);
