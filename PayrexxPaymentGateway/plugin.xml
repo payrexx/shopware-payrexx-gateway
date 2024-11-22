@@ -14,8 +14,8 @@
     <compatibility minVersion="5.4.0" />
 
     <changelog version="1.0.33">
-        <changes lang="de">Feature: Added new payment methods for Reka Pay by Bank</changes>
-        <changes lang="en">Feature: Added new payment methods for Reka Pay by Bank</changes>
+        <changes lang="de">Feature: Added new payment methods for Pay by Bank</changes>
+        <changes lang="en">Feature: Added new payment methods for Pay by Bank</changes>
     </changelog>
     <changelog version="1.0.32">
         <changes lang="de">Info: PostFinance Card and PostFinance E-Finance Payment Methods, Erweiterung: Neue Zahlungsmethode für Post Finance Pay hinzugefügt</changes>
