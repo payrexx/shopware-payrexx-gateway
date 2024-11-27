@@ -164,6 +164,7 @@ class PayrexxPaymentGateway extends Plugin
             'heidipay' => 'Pay monthly with HeidiPay',
             'reka' => 'Reka',
             'bank_transfer' => 'Bank Transfer',
+            'pay-by-bank' => 'Pay by Bank',
         );
 
         $installedPaymentMethods = $this->getInstalledPaymentMethods();
