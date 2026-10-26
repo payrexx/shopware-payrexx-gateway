@@ -196,11 +196,11 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
         $gatewayService = $this->container->get('prexx_payment_payrexx.payrexx_gateway_service');
 
         $requestTransaction = $this->request()->getParam('transaction');
-        $requestGatewayId = $requestTransaction['invoice']['paymentRequestId'];
-        $requestTransactionStatus = $requestTransaction['status'];
+        $requestTransactionId = $requestTransaction['id'] ?? null;
+        $requestGatewayId = $requestTransaction['invoice']['paymentRequestId'] ?? null;
 
         // check required data
-        if (!$requestTransactionStatus) {
+        if (!$requestTransactionId || !$requestGatewayId) {
             throw new \Exception('Payrexx Webhook Data incomplete');
         }
 
@@ -212,16 +212,60 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
             }
             throw new \Exception('No order found with paymentID ' . $requestGatewayId);
         }
-        if (!$order->getTransactionId() == $requestGatewayId) {
-            throw new \Exception('Transaction ID ('.$order->getTransactionId().') does not match requests gateway ID ( '.$requestGatewayId.')');
-        }
-        $transaction = $gatewayService->getTransaction($requestTransaction['id']);
 
-        if ($requestTransactionStatus != $transaction->getStatus()) {
-            throw new \Exception('Corrupt webhook status');
+        // Status and gateway binding are taken from the API, not from the request
+        $transaction = $gatewayService->getTransaction($requestTransactionId);
+        if (!$transaction) {
+            throw new \Exception('No transaction found with ID ' . $requestTransactionId);
+        }
+        $gateway = $gatewayService->getPayrexxGateway($order->getTransactionId());
+        if (!$gateway || !$this->isTransactionOfGateway($gateway, $transaction)) {
+            throw new \Exception(
+                'Transaction ' . $transaction->getId() . ' does not belong to gateway ' . $order->getTransactionId()
+            );
         }
 
-        $this->handleTransactionStatus($requestTransactionStatus, $requestGatewayId, $order);
+        $transactionStatus = $transaction->getStatus();
+        // The basket can change after the gateway was created and a bank transfer can be paid in parts,
+        // so only the sum of all confirmed transactions settles the order
+        if (
+            $transactionStatus === \Payrexx\Models\Response\Transaction::CONFIRMED
+            && $this->getConfirmedAmount($gateway) !== (int)round($order->getInvoiceAmount() * 100)
+        ) {
+            throw new \Exception(
+                'Confirmed amount of gateway ' . $gateway->getId() . ' does not match order ' . $order->getNumber()
+            );
+        }
+
+        $this->handleTransactionStatus($transactionStatus, $requestGatewayId, $order);
+    }
+
+    // The transaction response carries no gateway id, so the gateway is asked for its transactions instead
+    private function isTransactionOfGateway($gateway, $transaction)
+    {
+        foreach ($gateway->getInvoices() ?? [] as $invoice) {
+            foreach ($invoice['transactions'] ?? [] as $gatewayTransaction) {
+                if ((int)($gatewayTransaction['id'] ?? 0) === (int)$transaction->getId()) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private function getConfirmedAmount($gateway)
+    {
+        $amount = 0;
+        foreach ($gateway->getInvoices() ?? [] as $invoice) {
+            foreach ($invoice['transactions'] ?? [] as $gatewayTransaction) {
+                if (($gatewayTransaction['status'] ?? '') === \Payrexx\Models\Response\Transaction::CONFIRMED) {
+                    $amount += (int)($gatewayTransaction['amount'] ?? 0);
+                }
+            }
+        }
+
+        return $amount;
     }
 
     private function handleTransactionStatus($requestTransactionStatus,$requestGatewayId, $order) {

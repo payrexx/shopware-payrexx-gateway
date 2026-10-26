@@ -179,7 +179,7 @@ class PayrexxGatewayService
 
         $payrexx = $this->getInterface();
         $gateway = new \Payrexx\Models\Request\Gateway();
-        $gateway->setAmount($totalAmount * 100);
+        $gateway->setAmount((int)round($totalAmount * 100));
         $gateway->setCurrency($currency);
         $gateway->setSuccessRedirectUrl($urls['successUrl']);
         $gateway->setFailedRedirectUrl($urls['errorUrl']);
