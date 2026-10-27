@@ -226,15 +226,18 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
         }
 
         $transactionStatus = $transaction->getStatus();
-        // The basket can change after the gateway was created and a bank transfer can be paid in parts,
-        // so only the sum of all confirmed transactions settles the order
+        // A bank transfer can be paid in parts, so only the sum of all confirmed transactions settles the order.
+        // An overpayment still settles it, otherwise the order would stay open since the webhook is not resent.
         if (
             $transactionStatus === \Payrexx\Models\Response\Transaction::CONFIRMED
-            && $this->getConfirmedAmount($gateway) !== (int)round($order->getInvoiceAmount() * 100)
+            && $this->getConfirmedAmount($gateway) < (int)round($order->getInvoiceAmount() * 100)
         ) {
-            throw new \Exception(
-                'Confirmed amount of gateway ' . $gateway->getId() . ' does not match order ' . $order->getNumber()
+            // A partial payment is expected, so it is logged without failing the webhook
+            $this->container->get('pluginlogger')->warning(
+                'Payrexx webhook: confirmed amount of gateway ' . $gateway->getId()
+                . ' is lower than the total of order ' . $order->getNumber()
             );
+            return;
         }
 
         $this->handleTransactionStatus($transactionStatus, $requestGatewayId, $order);
