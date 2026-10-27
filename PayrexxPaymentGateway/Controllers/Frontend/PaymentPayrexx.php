@@ -142,7 +142,14 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
             }
             $order = $orderService->getShopwareOrderByNumber($this->getOrderNumber());
 
-            $this->handleTransactionStatus($transaction->getStatus(), $gatewayId, $order);
+            // The basket can change after the gateway was created, so the order stays open unless it is covered
+            $transactionStatus = $transaction->getStatus();
+            if (
+                $transactionStatus !== \Payrexx\Models\Response\Transaction::CONFIRMED
+                || $this->isOrderAmountCovered($gateway, $order)
+            ) {
+                $this->handleTransactionStatus($transactionStatus, $gatewayId, $order);
+            }
             $this->container->get('session')->offsetUnset('payrexxGatewayId');
         }
 
@@ -219,56 +226,41 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
             throw new \Exception('No transaction found with ID ' . $requestTransactionId);
         }
         $gateway = $gatewayService->getPayrexxGateway($order->getTransactionId());
-        if (!$gateway || !$this->isTransactionOfGateway($gateway, $transaction)) {
+        if (!$gateway || !$gatewayService->isTransactionOfGateway($gateway, $transaction)) {
             throw new \Exception(
                 'Transaction ' . $transaction->getId() . ' does not belong to gateway ' . $order->getTransactionId()
             );
         }
 
         $transactionStatus = $transaction->getStatus();
-        // A bank transfer can be paid in parts, so only the sum of all confirmed transactions settles the order.
-        // An overpayment still settles it, otherwise the order would stay open since the webhook is not resent.
         if (
             $transactionStatus === \Payrexx\Models\Response\Transaction::CONFIRMED
-            && $this->getConfirmedAmount($gateway) < (int)round($order->getInvoiceAmount() * 100)
+            && !$this->isOrderAmountCovered($gateway, $order)
         ) {
-            // A partial payment is expected, so it is logged without failing the webhook
-            $this->container->get('pluginlogger')->warning(
-                'Payrexx webhook: confirmed amount of gateway ' . $gateway->getId()
-                . ' is lower than the total of order ' . $order->getNumber()
-            );
             return;
         }
 
         $this->handleTransactionStatus($transactionStatus, $requestGatewayId, $order);
     }
 
-    // The transaction response carries no gateway id, so the gateway is asked for its transactions instead
-    private function isTransactionOfGateway($gateway, $transaction)
+    // A bank transfer can be paid in parts, so only the sum of all confirmed transactions settles the order.
+    // An overpayment still settles it, otherwise the order would stay open since the webhook is not resent.
+    private function isOrderAmountCovered($gateway, Order $order)
     {
-        foreach ($gateway->getInvoices() ?? [] as $invoice) {
-            foreach ($invoice['transactions'] ?? [] as $gatewayTransaction) {
-                if ((int)($gatewayTransaction['id'] ?? 0) === (int)$transaction->getId()) {
-                    return true;
-                }
-            }
+        /** @var PayrexxGatewayService $gatewayService */
+        $gatewayService = $this->container->get('prexx_payment_payrexx.payrexx_gateway_service');
+
+        if ($gatewayService->getConfirmedAmount($gateway) >= (int)round($order->getInvoiceAmount() * 100)) {
+            return true;
         }
+
+        // A partial payment is expected, so it is logged without failing the request
+        $this->container->get('pluginlogger')->warning(
+            'Payrexx: confirmed amount of gateway ' . $gateway->getId()
+            . ' is lower than the total of order ' . $order->getNumber()
+        );
 
         return false;
-    }
-
-    private function getConfirmedAmount($gateway)
-    {
-        $amount = 0;
-        foreach ($gateway->getInvoices() ?? [] as $invoice) {
-            foreach ($invoice['transactions'] ?? [] as $gatewayTransaction) {
-                if (($gatewayTransaction['status'] ?? '') === \Payrexx\Models\Response\Transaction::CONFIRMED) {
-                    $amount += (int)($gatewayTransaction['amount'] ?? 0);
-                }
-            }
-        }
-
-        return $amount;
     }
 
     private function handleTransactionStatus($requestTransactionStatus,$requestGatewayId, $order) {

@@ -90,6 +90,34 @@ class PayrexxGatewayService
         return false;
     }
 
+    // The transaction response carries no gateway id, so the gateway is asked for its transactions instead
+    public function isTransactionOfGateway(Gateway $gateway, Transaction $transaction)
+    {
+        foreach ($gateway->getInvoices() ?? [] as $invoice) {
+            foreach ($invoice['transactions'] ?? [] as $gatewayTransaction) {
+                if ((int)($gatewayTransaction['id'] ?? 0) === (int)$transaction->getId()) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public function getConfirmedAmount(Gateway $gateway)
+    {
+        $amount = 0;
+        foreach ($gateway->getInvoices() ?? [] as $invoice) {
+            foreach ($invoice['transactions'] ?? [] as $gatewayTransaction) {
+                if (($gatewayTransaction['status'] ?? '') === Transaction::CONFIRMED) {
+                    $amount += (int)($gatewayTransaction['amount'] ?? 0);
+                }
+            }
+        }
+
+        return $amount;
+    }
+
     /**
      * capture a Transaction
      *
