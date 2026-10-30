@@ -142,7 +142,14 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
             }
             $order = $orderService->getShopwareOrderByNumber($this->getOrderNumber());
 
-            $this->handleTransactionStatus($transaction->getStatus(), $gatewayId, $order);
+            // The basket can change after the gateway was created, so the order stays open unless it is covered
+            $transactionStatus = $transaction->getStatus();
+            if (
+                $transactionStatus !== \Payrexx\Models\Response\Transaction::CONFIRMED
+                || $this->isOrderAmountCovered($gateway, $order)
+            ) {
+                $this->handleTransactionStatus($transactionStatus, $gatewayId, $order);
+            }
             $this->container->get('session')->offsetUnset('payrexxGatewayId');
         }
 
@@ -196,11 +203,11 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
         $gatewayService = $this->container->get('prexx_payment_payrexx.payrexx_gateway_service');
 
         $requestTransaction = $this->request()->getParam('transaction');
-        $requestGatewayId = $requestTransaction['invoice']['paymentRequestId'];
-        $requestTransactionStatus = $requestTransaction['status'];
+        $requestTransactionId = $requestTransaction['id'] ?? null;
+        $requestGatewayId = $requestTransaction['invoice']['paymentRequestId'] ?? null;
 
         // check required data
-        if (!$requestTransactionStatus) {
+        if (!$requestTransactionId || !$requestGatewayId) {
             throw new \Exception('Payrexx Webhook Data incomplete');
         }
 
@@ -212,16 +219,48 @@ class Shopware_Controllers_Frontend_PaymentPayrexx extends Shopware_Controllers_
             }
             throw new \Exception('No order found with paymentID ' . $requestGatewayId);
         }
-        if (!$order->getTransactionId() == $requestGatewayId) {
-            throw new \Exception('Transaction ID ('.$order->getTransactionId().') does not match requests gateway ID ( '.$requestGatewayId.')');
-        }
-        $transaction = $gatewayService->getTransaction($requestTransaction['id']);
 
-        if ($requestTransactionStatus != $transaction->getStatus()) {
-            throw new \Exception('Corrupt webhook status');
+        // Status and gateway binding are taken from the API, not from the request
+        $transaction = $gatewayService->getTransaction($requestTransactionId);
+        if (!$transaction) {
+            throw new \Exception('No transaction found with ID ' . $requestTransactionId);
+        }
+        $gateway = $gatewayService->getPayrexxGateway($order->getTransactionId());
+        if (!$gateway || !$gatewayService->isTransactionOfGateway($gateway, $transaction)) {
+            throw new \Exception(
+                'Transaction ' . $transaction->getId() . ' does not belong to gateway ' . $order->getTransactionId()
+            );
         }
 
-        $this->handleTransactionStatus($requestTransactionStatus, $requestGatewayId, $order);
+        $transactionStatus = $transaction->getStatus();
+        if (
+            $transactionStatus === \Payrexx\Models\Response\Transaction::CONFIRMED
+            && !$this->isOrderAmountCovered($gateway, $order)
+        ) {
+            return;
+        }
+
+        $this->handleTransactionStatus($transactionStatus, $requestGatewayId, $order);
+    }
+
+    // A bank transfer can be paid in parts, so only the sum of all confirmed transactions settles the order.
+    // An overpayment still settles it, otherwise the order would stay open since the webhook is not resent.
+    private function isOrderAmountCovered($gateway, Order $order)
+    {
+        /** @var PayrexxGatewayService $gatewayService */
+        $gatewayService = $this->container->get('prexx_payment_payrexx.payrexx_gateway_service');
+
+        if ($gatewayService->getConfirmedAmount($gateway) >= (int)round($order->getInvoiceAmount() * 100)) {
+            return true;
+        }
+
+        // A partial payment is expected, so it is logged without failing the request
+        $this->container->get('pluginlogger')->warning(
+            'Payrexx: confirmed amount of gateway ' . $gateway->getId()
+            . ' is lower than the total of order ' . $order->getNumber()
+        );
+
+        return false;
     }
 
     private function handleTransactionStatus($requestTransactionStatus,$requestGatewayId, $order) {
